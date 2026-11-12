@@ -10,7 +10,7 @@ Material You dan dukungan voice Gemini opsional (membawa API key OpenRouter send
 
 </div>
 
-![ianvex tv launcher: Home dengan sapaan Indonesia, Now Playing, dan dock aplikasi](setup/material-tv-launcher-home.png)
+![ianvex tv launcher: Home dengan sapaan Indonesia, Now Playing, dan dock aplikasi](setup/screenshots/home.png)
 
 ## Fitur utama
 
@@ -28,6 +28,49 @@ Material You dan dukungan voice Gemini opsional (membawa API key OpenRouter send
 - **Tile tambahan**: Wi-Fi, Bluetooth, Do not disturb, Mute, Screensaver, Layar mati, Apps,
   Launcher, dan Pengaturan TV.
 - **Home button** tetap bekerja lewat accessibility service bawaan.
+
+## Screenshot
+
+Semua screenshot diambil langsung dari TV Android 14 (1280×720) yang menjalankan build 0.1.7.
+Klik gambar untuk membuka versi penuhnya.
+
+### Home, Apps, dan quick settings
+
+| Home | Apps |
+|:---:|:---:|
+| [![Home](setup/screenshots/home.png)](setup/screenshots/home.png) | [![Apps](setup/screenshots/apps.png)](setup/screenshots/apps.png) |
+| Sapaan Indonesia, Now Playing, dan dock 6 aplikasi | Grid semua aplikasi terpasang |
+
+| Quick settings gaya Android 17 |
+|:---:|
+| [![Quick settings](setup/screenshots/quick-settings.png)](setup/screenshots/quick-settings.png) |
+| Panel tengah dengan jam, 9 tile, slider kecerahan & volume, serta footer Dock apps / Tutup |
+
+### Pengaturan launcher
+
+| Pengaturan launcher | Warna aksen |
+|:---:|:---:|
+| [![Pengaturan launcher](setup/screenshots/launcher-settings.png)](setup/screenshots/launcher-settings.png) | [![Warna aksen](setup/screenshots/colors.png)](setup/screenshots/colors.png) |
+| Sapaan, nama, dan pintasan ke bagian lain | 8 warna aksen + mode Ikuti warna aplikasi |
+
+| Screensaver | Aplikasi tersembunyi & About |
+|:---:|:---:|
+| [![Pengaturan screensaver](setup/screenshots/screensaver-settings.png)](setup/screenshots/screensaver-settings.png) | [![Aplikasi tersembunyi](setup/screenshots/hidden-apps-about.png)](setup/screenshots/hidden-apps-about.png) |
+| Tiga gaya screensaver, Pratinjau, dan Waktu tidur layar | Daftar aplikasi disembunyikan dan versi launcher |
+
+### Tiga gaya screensaver
+
+| Bentuk + jam | Jam saja | Gelap |
+|:---:|:---:|:---:|
+| [![Bentuk + jam](setup/screenshots/screensaver-shape-clock.png)](setup/screenshots/screensaver-shape-clock.png) | [![Jam saja](setup/screenshots/screensaver-clock.png)](setup/screenshots/screensaver-clock.png) | [![Gelap](setup/screenshots/screensaver-dark.png)](setup/screenshots/screensaver-dark.png) |
+| Wallpaper bentuk Material You + jam | Jam besar di atas wallpaper | Latar gelap minimal |
+
+### Dock dan menu tile
+
+| Dock apps | Menu tile (tahan OK) |
+|:---:|:---:|
+| [![Dock apps](setup/screenshots/dock-apps.png)](setup/screenshots/dock-apps.png) | [![Menu tile](setup/screenshots/tile-menu.png)](setup/screenshots/tile-menu.png) |
+| Cari, pilih maksimal 6 aplikasi, dan atur urutannya | Info aplikasi, sembunyikan dari Home, copot pemasangan |
 
 ## Mulai cepat
 
