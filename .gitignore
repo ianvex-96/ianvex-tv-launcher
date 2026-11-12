@@ -1,0 +1,11 @@
+build/
+*.apk
+!setup/*.apk
+*.jks
+.DS_Store
+
+jni/lib/
+voice-deps/
+openrouter_key
+__pycache__/
+*.pyc

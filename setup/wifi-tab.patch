@@ -1,0 +1,3154 @@
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index 25dbc92..ec9b25c 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -4,6 +4,15 @@
+ 
+     <uses-permission android:name="android.permission.INTERNET" />
+     <uses-permission android:name="android.permission.RECORD_AUDIO" />
++    <!-- The dock shows the connected Wi-Fi network's name. SSID access needs location on Android 12+. -->
++    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
++    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
++    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
++    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
++    <!-- Quick settings: brightness slider, Bluetooth state, and the Do Not Disturb tile. -->
++    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
++    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
++    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+ 
+     <uses-feature android:name="android.software.leanback" android:required="false" />
+ 
+@@ -36,7 +45,7 @@
+     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+ 
+     <application
+-        android:label="Material TV Launcher"
++        android:label="ianvex tv launcher"
+         android:icon="@drawable/icon"
+         android:banner="@drawable/banner"
+         android:allowBackup="false"
+@@ -47,6 +56,20 @@
+             android:name=".TvControlActivity"
+             android:exported="true"
+             android:screenOrientation="landscape" />
++        <activity
++            android:name=".DockAppsActivity"
++            android:exported="false"
++            android:screenOrientation="landscape"
++            android:windowSoftInputMode="adjustResize" />
++        <activity
++            android:name=".LauncherSettingsActivity"
++            android:exported="false"
++            android:screenOrientation="landscape"
++            android:windowSoftInputMode="adjustResize" />
++        <activity
++            android:name=".ScreensaverActivity"
++            android:exported="false"
++            android:screenOrientation="landscape" />
+         <activity
+             android:name=".HomeActivity"
+             android:exported="true"
+diff --git a/res/drawable/ic_bluetooth.xml b/res/drawable/ic_bluetooth.xml
+new file mode 100644
+index 0000000..3701088
+--- /dev/null
++++ b/res/drawable/ic_bluetooth.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M17.71,7.71L12,2h-1v7.59L6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 11,14.41V22h1l5.71,-5.71 -4.3,-4.29 4.3,-4.29zM13,5.83l1.88,1.88L13,9.59V5.83zM14.88,16.29L13,18.17v-3.76l1.88,1.88z" />
++</vector>
+diff --git a/res/drawable/ic_brightness.xml b/res/drawable/ic_brightness.xml
+new file mode 100644
+index 0000000..a305141
+--- /dev/null
++++ b/res/drawable/ic_brightness.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M12,7c-2.76,0 -5,2.24 -5,5s2.24,5 5,5 5,-2.24 5,-5 -2.24,-5 -5,-5zM2,13h2v-2H2v2zM20,11v2h2v-2h-2zM11,2v2h2V2h-2zM11,20v2h2v-2h-2zM5.99,4.58L4.58,5.99 6,7.41 7.41,6 5.99,4.58zM18.01,19.42l1.41,-1.41 -1.42,-1.41 -1.41,1.41 1.42,1.41zM19.42,5.99l-1.41,-1.41 -1.41,1.42 1.41,1.41 1.41,-1.42zM6,17.41l-1.41,1.41 1.41,1.41 1.41,-1.41L6,17.41z" />
++</vector>
+diff --git a/res/drawable/ic_dnd.xml b/res/drawable/ic_dnd.xml
+new file mode 100644
+index 0000000..d4d7d83
+--- /dev/null
++++ b/res/drawable/ic_dnd.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM17,13H7v-2h10v2z" />
++</vector>
+diff --git a/res/drawable/ic_quick.xml b/res/drawable/ic_quick.xml
+new file mode 100644
+index 0000000..863961c
+--- /dev/null
++++ b/res/drawable/ic_quick.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M3,17v2h6v-2H3zM3,5v2h10V5H3zM13,21v-2h8v-2h-8v-2h-2v6h2zM7,9v2H3v2h4v2h2V9H7zM21,13v-2H11v2h10zM15,9h2V7h4V5h-4V3h-2v6z" />
++</vector>
+diff --git a/res/drawable/ic_screen_off.xml b/res/drawable/ic_screen_off.xml
+new file mode 100644
+index 0000000..58eb867
+--- /dev/null
++++ b/res/drawable/ic_screen_off.xml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- A monitor with a slash: turn the display off. -->
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M21,3H3C1.9,3 1,3.9 1,5v10c0,1.1 0.9,2 2,2h7v2H8v2h8v-2h-2v-2h7c1.1,0 2,-0.9 2,-2V5C23,3.9 22.1,3 21,3zM21,15H3V5h18V15z" />
++    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="2" android:strokeLineCap="round"
++        android:pathData="M3.4,3.4 L20.6,20.6" />
++</vector>
+diff --git a/res/drawable/ic_screensaver.xml b/res/drawable/ic_screensaver.xml
+new file mode 100644
+index 0000000..cbf64c5
+--- /dev/null
++++ b/res/drawable/ic_screensaver.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M11.99,2C6.47,2 2,6.48 2,12s4.47,10 9.99,10C17.52,22 22,17.52 22,12S17.52,2 11.99,2zM12,20c-4.42,0 -8,-3.58 -8,-8s3.58,-8 8,-8 8,3.58 8,8 -3.58,8 -8,8zM12.5,7H11v6l5.25,3.15 0.75,-1.23 -4.5,-2.67z" />
++</vector>
+diff --git a/res/drawable/ic_skip_next.xml b/res/drawable/ic_skip_next.xml
+new file mode 100644
+index 0000000..f80314d
+--- /dev/null
++++ b/res/drawable/ic_skip_next.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M6,18l8.5,-6L6,6zM16,6h2v12h-2z" />
++</vector>
+diff --git a/res/drawable/ic_skip_previous.xml b/res/drawable/ic_skip_previous.xml
+new file mode 100644
+index 0000000..431e176
+--- /dev/null
++++ b/res/drawable/ic_skip_previous.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M6,6h2v12H6zM9.5,12l8.5,6V6z" />
++</vector>
+diff --git a/res/drawable/ic_tune.xml b/res/drawable/ic_tune.xml
+new file mode 100644
+index 0000000..bf9133f
+--- /dev/null
++++ b/res/drawable/ic_tune.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Sliders: launcher settings. -->
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M3,17v2h6v-2H3zM3,5v2h10V5H3zM13,21v-2h8v-2h-8v-2h-2v6h2zM7,9v2H3v2h4v2h2V9H7zM21,13v-2H11v2h10zM15,9h2V7h4V5h-4V3h-2v6z" />
++</vector>
+diff --git a/res/drawable/ic_volume.xml b/res/drawable/ic_volume.xml
+new file mode 100644
+index 0000000..d240cc9
+--- /dev/null
++++ b/res/drawable/ic_volume.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M3,9v6h4l5,5V4L7,9H3zM16.5,12c0,-1.77 -1.02,-3.29 -2.5,-4.03v8.05c1.48,-0.73 2.5,-2.25 2.5,-4.02zM14,3.23v2.06c2.89,0.86 5,3.54 5,6.71s-2.11,5.85 -5,6.71v2.06c4.01,-0.91 7,-4.49 7,-8.77s-2.99,-7.86 -7,-8.77z" />
++</vector>
+diff --git a/res/drawable/ic_volume_off.xml b/res/drawable/ic_volume_off.xml
+new file mode 100644
+index 0000000..8c9052a
+--- /dev/null
++++ b/res/drawable/ic_volume_off.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M16.5,12c0,-1.77 -1.02,-3.29 -2.5,-4.03v2.21l2.45,2.45c0.03,-0.2 0.05,-0.41 0.05,-0.63zM19,12c0,0.94 -0.2,1.82 -0.54,2.64l1.51,1.51C20.63,14.91 21,13.5 21,12c0,-4.28 -2.99,-7.86 -7,-8.77v2.06c2.89,0.86 5,3.54 5,6.71zM4.27,3L3,4.27 7.73,9H3v6h4l5,5v-6.73l4.25,4.25c-0.67,0.52 -1.42,0.93 -2.25,1.18v2.06c1.38,-0.31 2.63,-0.95 3.69,-1.81L19.73,21 21,19.73l-9,-9L4.27,3zM12,4L9.91,6.09 12,8.18V4z" />
++</vector>
+diff --git a/res/drawable/ic_wifi.xml b/res/drawable/ic_wifi.xml
+new file mode 100644
+index 0000000..4e9aa2a
+--- /dev/null
++++ b/res/drawable/ic_wifi.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Wi-Fi: the familiar three arcs with a dot, shown on the network-name tab. -->
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M1,9l2,2c4.97,-4.97 13.03,-4.97 18,0l2,-2C16.93,2.93 7.08,2.93 1,9z M9,17l3,3 3,-3c-1.65,-1.66 -4.34,-1.66 -6,0z M5,13l2,2c2.76,-2.76 7.24,-2.76 10,0l2,-2C15.14,9.14 8.87,9.14 5,13z" />
++</vector>
+diff --git a/src/com/rampey/materialtv/ButtonGroup.java b/src/com/rampey/materialtv/ButtonGroup.java
+index 78aac83..6dc8369 100644
+--- a/src/com/rampey/materialtv/ButtonGroup.java
++++ b/src/com/rampey/materialtv/ButtonGroup.java
+@@ -7,6 +7,7 @@ import android.graphics.Color;
+ import android.graphics.Typeface;
+ import android.graphics.drawable.Drawable;
+ import android.graphics.drawable.GradientDrawable;
++import android.text.TextUtils;
+ import android.util.TypedValue;
+ import android.view.Gravity;
+ import android.view.View;
+@@ -53,6 +54,9 @@ final class ButtonGroup extends LinearLayout {
+             b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+             b.setGravity(Gravity.CENTER);
+             b.setPadding(dp(20), dp(11), dp(22), dp(11));
++            b.setSingleLine(true);
++            b.setEllipsize(TextUtils.TruncateAt.END);
++            b.setMaxWidth(dp(200));
+             b.setFocusable(true);
+             b.setClickable(true);
+             Drawable icon = context.getDrawable(icons[i]);
+@@ -174,6 +178,23 @@ final class ButtonGroup extends LinearLayout {
+         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics()));
+     }
+ 
++    /** Update a tab's text in place (the network-name tab follows the current SSID). */
++    void setLabel(int index, String label) {
++        TextView b = buttons.get(index);
++        if (!b.getText().toString().equals(label)) b.setText(label);
++    }
++
++    /** Swap a tab's leading icon, keeping it tinted like the rest of the strip. */
++    void setIcon(int index, int iconRes) {
++        TextView b = buttons.get(index);
++        Drawable icon = getContext().getDrawable(iconRes);
++        if (icon == null) return;
++        icon.setBounds(0, 0, dp(18), dp(18));
++        icon.setTintList(ColorStateList.valueOf(b.getCurrentTextColor()));
++        b.setCompoundDrawablesRelative(icon, null, null, null);
++        b.setCompoundDrawablePadding(dp(8));
++    }
++
+     View button(int index) {
+         return buttons.get(index);
+     }
+diff --git a/src/com/rampey/materialtv/Dates.java b/src/com/rampey/materialtv/Dates.java
+new file mode 100644
+index 0000000..26e813c
+--- /dev/null
++++ b/src/com/rampey/materialtv/Dates.java
+@@ -0,0 +1,32 @@
++package com.rampey.materialtv;
++
++import java.util.Calendar;
++import java.util.Date;
++import java.util.Locale;
++
++/** Indonesian date and 24-hour time, independent of the TV's system language. */
++final class Dates {
++    private static final String[] DAYS = {
++            "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"};
++    private static final String[] MONTHS = {
++            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
++            "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
++
++    private Dates() {
++    }
++
++    /** "Rabu, 11 November" */
++    static String date(Date date) {
++        Calendar c = Calendar.getInstance();
++        c.setTime(date);
++        return DAYS[c.get(Calendar.DAY_OF_WEEK) - 1] + ", " + c.get(Calendar.DAY_OF_MONTH) + " "
++                + MONTHS[c.get(Calendar.MONTH)];
++    }
++
++    /** "17:09" */
++    static String time(Date date) {
++        Calendar c = Calendar.getInstance();
++        c.setTime(date);
++        return String.format(Locale.ROOT, "%02d:%02d", c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
++    }
++}
+diff --git a/src/com/rampey/materialtv/DockAppsActivity.java b/src/com/rampey/materialtv/DockAppsActivity.java
+new file mode 100644
+index 0000000..6d8e514
+--- /dev/null
++++ b/src/com/rampey/materialtv/DockAppsActivity.java
+@@ -0,0 +1,472 @@
++package com.rampey.materialtv;
++
++import android.app.Activity;
++import android.content.Intent;
++import android.content.pm.PackageManager;
++import android.content.pm.ResolveInfo;
++import android.graphics.Color;
++import android.graphics.Typeface;
++import android.graphics.drawable.GradientDrawable;
++import android.os.Bundle;
++import android.text.Editable;
++import android.text.InputType;
++import android.text.TextUtils;
++import android.text.TextWatcher;
++import android.util.TypedValue;
++import android.view.Gravity;
++import android.view.KeyEvent;
++import android.view.View;
++import android.view.ViewGroup;
++import android.view.inputmethod.EditorInfo;
++import android.widget.EditText;
++import android.widget.FrameLayout;
++import android.widget.HorizontalScrollView;
++import android.widget.ImageView;
++import android.widget.LinearLayout;
++import android.widget.ScrollView;
++import android.widget.TextView;
++import android.widget.Toast;
++
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.LinkedHashMap;
++import java.util.List;
++import java.util.Locale;
++import java.util.Map;
++
++/** Pick the apps that appear in the home dock: search, choose, and put them in order. Opened from quick settings. */
++public class DockAppsActivity extends Activity {
++    private static final int MAX_APPS = 6;
++
++    private final List<String> selected = new ArrayList<>();
++    private final List<Row> rows = new ArrayList<>();
++    private final List<TextView> chipViews = new ArrayList<>();
++    private PackageManager pm;
++    private Palette palette;
++    private TextView count;
++    private TextView saveButton;
++    private EditText search;
++    private LinearLayout list;
++    private LinearLayout chips;
++    private HorizontalScrollView chipScroller;
++    private TextView chipHint;
++
++    private static final class Row {
++        LinearLayout view;
++        TextView name;
++        TextView check;
++        String pkg;
++        String label;
++        GradientDrawable bg;
++    }
++
++    @Override protected void onCreate(Bundle state) {
++        super.onCreate(state);
++        pm = getPackageManager();
++        palette = Palette.of(getIntent().getIntExtra("seed", Palette.DEFAULT_SEED));
++        readInitialSelection();
++        setContentView(build());
++        filter(search == null ? "" : search.getText().toString());
++        if (search != null) search.requestFocus();
++    }
++
++    private void readInitialSelection() {
++        String saved = LauncherPrefs.getDockApps(this);
++        if (saved != null) {
++            addSaved(saved.split(","));
++            return;
++        }
++        String[] current = getIntent().getStringArrayExtra("current");
++        if (current != null) addSaved(current);
++    }
++
++    private void addSaved(String[] packages) {
++        for (String pkg : packages) {
++            if (selected.size() >= MAX_APPS) break;
++            if (pkg == null || pkg.isEmpty() || LauncherPrefs.isHidden(this, pkg)) continue;
++            if (pm.getLaunchIntentForPackage(pkg) != null && !selected.contains(pkg)) selected.add(pkg);
++        }
++    }
++
++    private View build() {
++        LinearLayout column = new LinearLayout(this);
++        column.setOrientation(LinearLayout.VERTICAL);
++        column.setPadding(dp(48), dp(24), dp(48), dp(18));
++        column.setBackgroundColor(palette.surface);
++
++        TextView title = text("Dock apps", 30, palette.onSurface, 760);
++        title.setIncludeFontPadding(false);
++        column.addView(title, match());
++
++        TextView hint = text("Pilih maksimal 6 aplikasi. Urutkan dengan tombol kiri/kanan.", 13, palette.onSurfaceVariant, 500);
++        hint.setPadding(0, dp(3), 0, dp(8));
++        column.addView(hint, match());
++
++        search = new EditText(this);
++        search.setSingleLine(true);
++        search.setHint("Cari aplikasi");
++        search.setHintTextColor(withAlpha(palette.onSurfaceVariant, 0xAA));
++        search.setTextColor(palette.onSurface);
++        search.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
++        search.setInputType(InputType.TYPE_CLASS_TEXT);
++        search.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
++        search.setPadding(dp(14), dp(8), dp(14), dp(8));
++        search.setBackground(fieldBackground(false));
++        search.setFocusable(true);
++        search.setFocusableInTouchMode(true);
++        search.setOnFocusChangeListener((v, focused) -> search.setBackground(fieldBackground(focused)));
++        search.addTextChangedListener(new TextWatcher() {
++            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
++            }
++            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
++            }
++            @Override public void afterTextChanged(Editable s) {
++                filter(s.toString());
++            }
++        });
++        LinearLayout.LayoutParams searchLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        searchLp.bottomMargin = dp(8);
++        column.addView(search, searchLp);
++
++        chipHint = text("", 12, palette.primary, 650);
++        chipHint.setPadding(dp(2), 0, 0, dp(4));
++        column.addView(chipHint, match());
++
++        chipScroller = new HorizontalScrollView(this);
++        chipScroller.setHorizontalScrollBarEnabled(false);
++        chipScroller.setFocusable(false);
++        chipScroller.setClipToPadding(false);
++        chipScroller.setClipChildren(false);
++        chips = new LinearLayout(this);
++        chips.setOrientation(LinearLayout.HORIZONTAL);
++        chips.setPadding(0, dp(2), 0, dp(4));
++        chipScroller.addView(chips);
++        LinearLayout.LayoutParams chipLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        chipLp.bottomMargin = dp(4);
++        column.addView(chipScroller, chipLp);
++
++        count = text("", 12, palette.primary, 650);
++        count.setPadding(dp(2), 0, 0, dp(6));
++        column.addView(count, match());
++        updateCount();
++
++        ScrollView scroll = new ScrollView(this);
++        scroll.setFocusable(false);
++        scroll.setClipToPadding(false);
++        list = new LinearLayout(this);
++        list.setOrientation(LinearLayout.VERTICAL);
++        list.setPadding(0, dp(2), 0, dp(8));
++        scroll.addView(list, new FrameLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++        column.addView(scroll, new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
++
++        List<ResolveInfo> apps = launchableApps();
++        for (ResolveInfo info : apps) addRow(info);
++
++        LinearLayout footer = new LinearLayout(this);
++        footer.setOrientation(LinearLayout.HORIZONTAL);
++        footer.setGravity(Gravity.CENTER_VERTICAL);
++        footer.setPadding(0, dp(10), 0, 0);
++        TextView automatic = footerButton("Otomatis", false);
++        automatic.setOnClickListener(v -> {
++            LauncherPrefs.clearDockApps(this);
++            Toast.makeText(this, "Dock memakai urutan otomatis", Toast.LENGTH_SHORT).show();
++            finish();
++        });
++        saveButton = footerButton("Simpan", true);
++        saveButton.setOnClickListener(v -> {
++            LauncherPrefs.setDockApps(this, selected);
++            Toast.makeText(this, "Dock disimpan", Toast.LENGTH_SHORT).show();
++            finish();
++        });
++        footer.addView(automatic, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
++        View gap = new View(this);
++        footer.addView(gap, new LinearLayout.LayoutParams(dp(10), dp(1)));
++        footer.addView(saveButton, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
++        column.addView(footer, match());
++
++        rebuildChips();
++        return column;
++    }
++
++    private GradientDrawable fieldBackground(boolean focused) {
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(14));
++        bg.setColor(palette.container);
++        bg.setStroke(focused ? dp(2) : dp(1),
++                focused ? palette.primary : withAlpha(palette.onSurfaceVariant, 0x33));
++        return bg;
++    }
++
++    private void addRow(ResolveInfo info) {
++        String pkg = info.activityInfo.packageName;
++        String label = String.valueOf(info.loadLabel(pm));
++
++        Row row = new Row();
++        row.pkg = pkg;
++        row.label = label;
++        row.view = new LinearLayout(this);
++        row.view.setOrientation(LinearLayout.HORIZONTAL);
++        row.view.setGravity(Gravity.CENTER_VERTICAL);
++        row.view.setPadding(dp(14), dp(9), dp(14), dp(9));
++        row.view.setFocusable(true);
++        // A tap should click, not only take focus: one tap selects the app.
++        row.view.setFocusableInTouchMode(false);
++        row.view.setClickable(true);
++        row.view.setDefaultFocusHighlightEnabled(false);
++        row.bg = new GradientDrawable();
++        row.bg.setCornerRadius(dp(14));
++        row.view.setBackground(row.bg);
++
++        ImageView icon = new ImageView(this);
++        icon.setImageDrawable(info.loadIcon(pm));
++        row.view.addView(icon, new LinearLayout.LayoutParams(dp(28), dp(28)));
++
++        row.name = text(label, 16, palette.onSurface, 550);
++        row.name.setSingleLine(true);
++        row.name.setEllipsize(TextUtils.TruncateAt.END);
++        LinearLayout.LayoutParams nameLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
++        nameLp.setMarginStart(dp(14));
++        row.view.addView(row.name, nameLp);
++
++        row.check = text("✓", 18, palette.primary, 800);
++        row.check.setPadding(dp(12), 0, 0, 0);
++        row.view.addView(row.check, new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++
++        row.view.setOnClickListener(v -> toggle(row));
++        row.view.setOnFocusChangeListener((v, focused) -> paint(row));
++        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        lp.bottomMargin = dp(6);
++        list.addView(row.view, lp);
++        rows.add(row);
++        paint(row);
++    }
++
++    private void toggle(Row row) {
++        if (selected.contains(row.pkg)) {
++            selected.remove(row.pkg);
++        } else {
++            if (selected.size() >= MAX_APPS) {
++                Toast.makeText(this, "Maksimal 6 aplikasi", Toast.LENGTH_SHORT).show();
++                return;
++            }
++            selected.add(row.pkg);
++        }
++        updateCount();
++        paint(row);
++        rebuildChips();
++    }
++
++    private void rebuildChips() {
++        chips.removeAllViews();
++        chipViews.clear();
++        if (selected.isEmpty()) {
++            chipHint.setText("Belum ada aplikasi dipilih.");
++            chipScroller.setVisibility(View.GONE);
++            return;
++        }
++        chipScroller.setVisibility(View.VISIBLE);
++        chipHint.setText("Urutan dock (◀ ▶ untuk menggeser)");
++        for (int i = 0; i < selected.size(); i++) {
++            final int index = i;
++            String pkg = selected.get(i);
++            String label = labelFor(pkg);
++            TextView chip = text((i + 1) + "  " + label, 13, palette.onSurface, 650);
++            chip.setSingleLine(true);
++            chip.setEllipsize(TextUtils.TruncateAt.END);
++            chip.setMaxWidth(dp(190));
++            chip.setGravity(Gravity.CENTER);
++            chip.setPadding(dp(14), dp(8), dp(14), dp(8));
++            chip.setFocusable(true);
++            chip.setFocusableInTouchMode(false);
++            chip.setClickable(true);
++            chip.setDefaultFocusHighlightEnabled(false);
++            GradientDrawable bg = new GradientDrawable();
++            bg.setCornerRadius(dp(18));
++            bg.setColor(palette.containerHigh);
++            bg.setStroke(dp(1), withAlpha(palette.primary, 0x66));
++            chip.setBackground(bg);
++            chip.setOnFocusChangeListener((v, focused) -> {
++                bg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.22f) : palette.containerHigh);
++                bg.setStroke(focused ? dp(2) : dp(1),
++                        focused ? palette.primary : withAlpha(palette.primary, 0x66));
++                chip.setTextColor(focused ? palette.onSurface : palette.onSurfaceVariant);
++                if (focused) scrollChipIntoView(chip);
++            });
++            chip.setOnKeyListener((v, keyCode, event) -> {
++                if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
++                if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
++                    moveChip(index, -1);
++                    return true;
++                }
++                if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
++                    moveChip(index, 1);
++                    return true;
++                }
++                return false;
++            });
++            // A tap on a chip removes it from the dock (the list row stays ticked until it is tapped too).
++            chip.setOnClickListener(v -> {
++                selected.remove(pkg);
++                updateCount();
++                rebuildChips();
++                for (Row row : rows) if (row.pkg.equals(pkg)) paint(row);
++                if (!chipViews.isEmpty()) chipViews.get(Math.min(index, chipViews.size() - 1)).requestFocus();
++                else if (search != null) search.requestFocus();
++            });
++            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
++                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++            if (i > 0) lp.setMarginStart(dp(7));
++            chips.addView(chip, lp);
++            chipViews.add(chip);
++        }
++    }
++
++    private void moveChip(int index, int delta) {
++        int to = index + delta;
++        if (to < 0 || to >= selected.size()) return;
++        Collections.swap(selected, index, to);
++        rebuildChips();
++        if (to < chipViews.size()) chipViews.get(to).requestFocus();
++    }
++
++    private void scrollChipIntoView(View chip) {
++        if (chipScroller == null) return;
++        chipScroller.post(() -> {
++            int left = chip.getLeft() - dp(8);
++            int right = chip.getRight() + dp(8) - chipScroller.getWidth();
++            if (left < chipScroller.getScrollX()) chipScroller.smoothScrollTo(Math.max(0, left), 0);
++            else if (right > chipScroller.getScrollX()) chipScroller.smoothScrollTo(Math.max(0, right), 0);
++        });
++    }
++
++    private String labelFor(String pkg) {
++        for (Row row : rows) if (row.pkg.equals(pkg)) return row.label;
++        try {
++            return String.valueOf(pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)));
++        } catch (PackageManager.NameNotFoundException e) {
++            return pkg;
++        }
++    }
++
++    private void filter(String query) {
++        String q = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
++        View firstVisible = null;
++        for (Row row : rows) {
++            boolean visible = q.isEmpty() || row.label.toLowerCase(Locale.ROOT).contains(q)
++                    || row.pkg.toLowerCase(Locale.ROOT).contains(q);
++            row.view.setVisibility(visible ? View.VISIBLE : View.GONE);
++            if (visible && firstVisible == null) firstVisible = row.view;
++        }
++        if (q.isEmpty()) return;
++        View focus = getCurrentFocus();
++        if (focus != null && focus.getVisibility() != View.VISIBLE && firstVisible != null) {
++            firstVisible.requestFocus();
++        }
++    }
++
++    private void updateCount() {
++        if (count != null) count.setText(selected.size() + " dari " + MAX_APPS + " dipilih");
++    }
++
++    private void paint(Row row) {
++        boolean on = selected.contains(row.pkg);
++        boolean focused = row.view.hasFocus();
++        row.bg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.18f)
++                : on ? palette.containerHigh : palette.container);
++        if (focused) {
++            row.bg.setStroke(dp(2), palette.primary);
++        } else if (on) {
++            row.bg.setStroke(dp(1), withAlpha(palette.primary, 0x99));
++        } else {
++            row.bg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x22));
++        }
++        row.name.setTextColor(palette.onSurface);
++        row.check.setVisibility(on ? View.VISIBLE : View.INVISIBLE);
++    }
++
++    private TextView footerButton(String label, boolean filled) {
++        TextView b = text(label, 15, filled ? palette.onPrimary : palette.onSurface, 650);
++        b.setGravity(Gravity.CENTER);
++        b.setPadding(dp(18), dp(11), dp(18), dp(11));
++        b.setFocusable(true);
++        b.setFocusableInTouchMode(false);
++        b.setClickable(true);
++        b.setDefaultFocusHighlightEnabled(false);
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(20));
++        bg.setColor(filled ? palette.primary : palette.container);
++        if (!filled) bg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x22));
++        b.setBackground(bg);
++        b.setOnFocusChangeListener((v, focused) -> {
++            if (filled) {
++                bg.setColor(focused ? blend(palette.primary, palette.onPrimary, 0.14f) : palette.primary);
++                bg.setStroke(focused ? dp(2) : 0, palette.onPrimary);
++            } else {
++                bg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.18f) : palette.container);
++                bg.setStroke(focused ? dp(2) : dp(1),
++                        focused ? palette.primary : withAlpha(palette.onSurfaceVariant, 0x22));
++            }
++        });
++        return b;
++    }
++
++    private List<ResolveInfo> launchableApps() {
++        Map<String, ResolveInfo> byPackage = new LinkedHashMap<>();
++        for (String category : new String[]{Intent.CATEGORY_LEANBACK_LAUNCHER, Intent.CATEGORY_LAUNCHER}) {
++            for (ResolveInfo info : pm.queryIntentActivities(
++                    new Intent(Intent.ACTION_MAIN).addCategory(category), 0)) {
++                String pkg = info.activityInfo.packageName;
++                if (pkg.equals(getPackageName()) || HomeActivity.NOT_IN_DOCK.contains(pkg)) continue;
++                if (LauncherPrefs.isHidden(this, pkg)) continue;
++                if (pm.getLaunchIntentForPackage(pkg) == null) continue;
++                byPackage.putIfAbsent(pkg, info);
++            }
++        }
++        List<ResolveInfo> apps = new ArrayList<>(byPackage.values());
++        Map<ResolveInfo, String> labels = new LinkedHashMap<>();
++        for (ResolveInfo info : apps) labels.put(info, String.valueOf(info.loadLabel(pm)));
++        Collections.sort(apps, (a, b) -> labels.get(a).compareToIgnoreCase(labels.get(b)));
++        return apps;
++    }
++
++    private TextView text(CharSequence value, float sp, int color, int weight) {
++        TextView t = new TextView(this);
++        t.setText(value);
++        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
++        t.setTextColor(color);
++        try {
++            t.setTypeface(new Typeface.Builder(getAssets(), "fonts/GoogleSansFlex.ttf")
++                    .setFontVariationSettings("'wght' " + weight + ", 'opsz' 24, 'ROND' 0").build());
++        } catch (RuntimeException ignored) {
++        }
++        return t;
++    }
++
++    private static int withAlpha(int color, int alpha) {
++        return (color & 0x00FFFFFF) | (alpha << 24);
++    }
++
++    private static int blend(int base, int overlay, float amount) {
++        float keep = 1f - amount;
++        int r = Math.round(Color.red(base) * keep + Color.red(overlay) * amount);
++        int g = Math.round(Color.green(base) * keep + Color.green(overlay) * amount);
++        int b = Math.round(Color.blue(base) * keep + Color.blue(overlay) * amount);
++        return Color.argb(255, r, g, b);
++    }
++
++    private LinearLayout.LayoutParams match() {
++        return new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++    }
++
++    private int dp(float value) {
++        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value,
++                getResources().getDisplayMetrics()));
++    }
++}
+diff --git a/src/com/rampey/materialtv/HomeActivity.java b/src/com/rampey/materialtv/HomeActivity.java
+index 8fe53cd..89318e0 100644
+--- a/src/com/rampey/materialtv/HomeActivity.java
++++ b/src/com/rampey/materialtv/HomeActivity.java
+@@ -4,7 +4,10 @@ import android.animation.ArgbEvaluator;
+ import android.animation.ObjectAnimator;
+ import android.animation.ValueAnimator;
+ import android.app.Activity;
++import android.app.NotificationManager;
+ import android.app.PendingIntent;
++import android.bluetooth.BluetoothAdapter;
++import android.bluetooth.BluetoothManager;
+ import android.content.ActivityNotFoundException;
+ import android.content.ComponentName;
+ import android.content.Intent;
+@@ -18,6 +21,7 @@ import android.graphics.Color;
+ import android.graphics.Typeface;
+ import android.graphics.drawable.Drawable;
+ import android.graphics.drawable.GradientDrawable;
++import android.media.AudioManager;
+ import android.media.MediaMetadata;
+ import android.media.tv.TvContract;
+ import android.media.tv.TvInputInfo;
+@@ -25,7 +29,12 @@ import android.media.tv.TvInputManager;
+ import android.media.session.MediaController;
+ import android.media.session.MediaSessionManager;
+ import android.media.session.PlaybackState;
++import android.net.ConnectivityManager;
++import android.net.Network;
++import android.net.NetworkCapabilities;
+ import android.net.Uri;
++import android.net.wifi.WifiInfo;
++import android.net.wifi.WifiManager;
+ import android.os.Bundle;
+ import android.os.Handler;
+ import android.os.Looper;
+@@ -44,8 +53,10 @@ import android.widget.HorizontalScrollView;
+ import android.widget.ImageView;
+ import android.widget.LinearLayout;
+ import android.widget.ScrollView;
++import android.widget.SeekBar;
+ import android.widget.Space;
+ import android.widget.TextView;
++import android.widget.Toast;
+ 
+ import java.io.File;
+ import java.nio.charset.StandardCharsets;
+@@ -60,6 +71,7 @@ import java.util.Locale;
+ import java.util.Map;
+ import java.util.Set;
+ import java.util.concurrent.ConcurrentHashMap;
++import java.util.function.IntConsumer;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+ 
+@@ -123,8 +135,18 @@ public class HomeActivity extends Activity {
+     private LinearLayout dock;
+     private TextView clock;
+     private TextView date;
++    private TextView greeting;
+     private TextView focusTitle;
+     private ButtonGroup nav;
++    private FrameLayout rootView;
++    private ViewGroup mainColumn;
++    private FrameLayout quickOverlay;
++    private View quickReturnFocus;
++    private TextView quickTime, quickDate;
++    private FrameLayout tileMenu;
++    private View tileMenuReturnFocus;
++    private int appliedAccent;
++    private boolean appliedDynamic;
+ 
+     // Focus settles before the expensive part runs, so holding a direction stays smooth.
+     private String pendingPkg;
+@@ -140,7 +162,7 @@ public class HomeActivity extends Activity {
+     private MediaSessionManager sessions;
+     private ComponentName mediaListener;
+     private MediaController playing;
+-    private View nowCard;
++    private ViewGroup nowCard;
+     private ImageView nowArt;
+     private TextView nowTitle;
+     private TextView nowArtist;
+@@ -180,6 +202,8 @@ public class HomeActivity extends Activity {
+     private ImageView nowButton;
+     private GradientDrawable nowShape;
+     private GradientDrawable nowButtonShape;
++    private ImageView nowPrev, nowNext;
++    private GradientDrawable nowPrevShape, nowNextShape;
+     // The callbacks hand over the session's metadata and state; they are kept rather than fetched again from the
+     // controller, which would re-parcel the whole bundle (album art included) several times a second.
+     private final MediaController.Callback mediaCallback = new MediaController.Callback() {
+@@ -249,35 +273,122 @@ public class HomeActivity extends Activity {
+                 }).start();
+     }
+ 
++    /** The connected network's name, or "Wi-Fi" while disconnected. SSID is quoted by the framework. */
++    private String connectedWifiName() {
++        try {
++            ConnectivityManager cm = getSystemService(ConnectivityManager.class);
++            if (cm != null) {
++                Network network = cm.getActiveNetwork();
++                NetworkCapabilities caps = cm.getNetworkCapabilities(network);
++                if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
++                    Object info = caps.getTransportInfo();
++                    if (info instanceof WifiInfo) {
++                        String ssid = cleanSsid((WifiInfo) info);
++                        if (ssid != null) return ssid;
++                    }
++                }
++            }
++        } catch (RuntimeException ignored) {
++            // Fall through to WifiManager below.
++        }
++        try {
++            WifiManager wm = getSystemService(WifiManager.class);
++            if (wm != null) {
++                String ssid = cleanSsid(wm.getConnectionInfo());
++                if (ssid != null) return ssid;
++            }
++        } catch (RuntimeException ignored) {
++            // Location may be off, or the TV may not expose Wi-Fi state to the app.
++        }
++        return "Wi-Fi";
++    }
++
++    private static String cleanSsid(WifiInfo info) {
++        if (info == null) return null;
++        String ssid = info.getSSID();
++        if (ssid == null) return null;
++        if (ssid.length() >= 2 && ssid.startsWith("\"") && ssid.endsWith("\"")) {
++            ssid = ssid.substring(1, ssid.length() - 1);
++        }
++        if (ssid.isEmpty() || ssid.equals("<unknown ssid>") || ssid.equals("0x")) return null;
++        return ssid;
++    }
++
++    private void updateWifiLabel() {
++        if (nav != null) nav.setLabel(2, connectedWifiName());
++    }
++
++    private void updateGreeting() {
++        if (greeting == null) return;
++        if (!LauncherPrefs.greetingOn(this)) {
++            greeting.setVisibility(View.GONE);
++            return;
++        }
++        greeting.setVisibility(View.VISIBLE);
++        int hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
++        String part = hour >= 4 && hour < 11 ? "Selamat pagi"
++                : hour >= 11 && hour < 15 ? "Selamat siang"
++                : hour >= 15 && hour < 19 ? "Selamat sore"
++                : "Selamat malam";
++        String name = LauncherPrefs.greetingName(this);
++        greeting.setText(name.isEmpty() ? part : part + ", " + name);
++    }
++
+     private final Runnable tick = new Runnable() {
+         @Override public void run() {
+             Date now = new Date();
+-            String time = new SimpleDateFormat("h:mm", Locale.getDefault()).format(now);
++            String time = Dates.time(now);
+             if (clock.getText().length() == 0) {
+                 clock.setText(time);
+                 clock.setTypeface(clockFont(clockWeight()));
+             } else if (!time.contentEquals(clock.getText())) {
+                 changeClock(time);
+             }
+-            date.setText(new SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(now));
++            date.setText(Dates.date(now));
++            updateGreeting();
++            updateWifiLabel();
+             handler.postDelayed(this, 15_000);
+         }
+     };
+ 
++    private final Runnable quickTick = new Runnable() {
++        @Override public void run() {
++            if (quickTime == null || quickDate == null) return;
++            Date now = new Date();
++            quickTime.setText(Dates.time(now));
++            quickDate.setText(Dates.date(now));
++            handler.postDelayed(this, 30_000);
++        }
++    };
++    private final Runnable restoreTimeout = this::restoreScreenTimeout;
++
+     @Override protected void onCreate(Bundle state) {
+         super.onCreate(state);
+         liveHome = new java.lang.ref.WeakReference<>(this);
+         pm = getPackageManager();
++        appliedAccent = LauncherPrefs.accentSeed(this);
++        appliedDynamic = LauncherPrefs.dynamicColor(this);
++        palette = Palette.of(appliedAccent);
+         setContentView(buildRoot());
+     }
+ 
+     @Override protected void onResume() {
+         super.onResume();
++        int accent = LauncherPrefs.accentSeed(this);
++        boolean dynamic = LauncherPrefs.dynamicColor(this);
++        if (accent != appliedAccent || dynamic != appliedDynamic) {
++            appliedAccent = accent;
++            appliedDynamic = dynamic;
++            recreate();
++            return;
++        }
++        restoreScreenTimeout();
+         if (pendingResume != null) { pendingResume.cancel(); pendingResume = null; }
+         fillDock();
+         if (showingApps) fillApps();
+         handler.removeCallbacks(tick);
+         handler.post(tick);
++        updateWifiLabel();
+         drifting = true;
+         driftLast = 0;
+         shape.removeCallbacks(drift);
+@@ -303,6 +414,23 @@ public class HomeActivity extends Activity {
+         handler.removeCallbacks(prebuildApps);
+         if (colorAnimator != null) colorAnimator.end();
+         nav.stopAnimations();
++        if (quickOverlay != null && rootView != null) {
++            rootView.removeView(quickOverlay);
++            quickOverlay = null;
++            quickReturnFocus = null;
++            if (mainColumn != null) mainColumn.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
++            if (nowCard != null) nowCard.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
++        }
++        handler.removeCallbacks(quickTick);
++        quickTime = null;
++        quickDate = null;
++        if (tileMenu != null && rootView != null) {
++            rootView.removeView(tileMenu);
++            tileMenu = null;
++            tileMenuReturnFocus = null;
++            if (mainColumn != null) mainColumn.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
++            if (nowCard != null) nowCard.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
++        }
+         handler.removeCallbacks(settle);
+         // The media session stays watched (it only updates fields, never views) so the card remembers what played
+         // while another app had the screen; it is let go in onDestroy.
+@@ -329,6 +457,14 @@ public class HomeActivity extends Activity {
+ 
+ 
+     @Override public void onBackPressed() {
++        if (tileMenu != null) {
++            closeTileMenu();
++            return;
++        }
++        if (quickOverlay != null) {
++            closeQuickSettings();
++            return;
++        }
+         if (showingApps) showHome();
+     }
+ 
+@@ -344,6 +480,7 @@ public class HomeActivity extends Activity {
+ 
+     private View buildRoot() {
+         FrameLayout root = new FrameLayout(this);
++        rootView = root;
+         backdrop = new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{palette.surfaceBright, palette.surface});
+         root.setBackground(backdrop);
+ 
+@@ -365,8 +502,9 @@ public class HomeActivity extends Activity {
+         column.setClipChildren(false);
+         column.setClipToPadding(false);
+         root.addView(column, match());
++        mainColumn = column;
+ 
+-        nowCard = buildNowPlaying();
++        nowCard = (ViewGroup) buildNowPlaying();
+         FrameLayout.LayoutParams nowLp = new FrameLayout.LayoutParams(dp(380), ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END | Gravity.TOP);
+         nowLp.setMargins(0, dp(140), dp(SIDE), 0);
+         root.addView(nowCard, nowLp);
+@@ -414,21 +552,28 @@ public class HomeActivity extends Activity {
+         date = text("", 15, palette.onSurfaceVariant, 500);
+         date.setPadding(dp(2), dp(2), 0, 0);
+         when.addView(date);
++        greeting = text("", 13, palette.onSurfaceVariant, 500);
++        greeting.setPadding(dp(2), dp(5), 0, 0);
++        when.addView(greeting);
+         bar.addView(when, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.START | Gravity.TOP));
+ 
+         nav = new ButtonGroup(this, font(600), palette,
+-                new String[]{"Home", "Apps", "Ask", "Settings"},
+-                new int[]{R.drawable.ic_home, R.drawable.ic_apps, R.drawable.ic_ask, R.drawable.ic_settings},
++                new String[]{"Home", "Apps", "Wi-Fi", "Quick Settings"},
++                new int[]{R.drawable.ic_home, R.drawable.ic_apps, R.drawable.ic_wifi, R.drawable.ic_quick},
+                 new boolean[]{true, true, false, false},
+                 index -> {
+                     if (index == 0) showHome();
+                     else if (index == 1) showApps();
+                     else if (index == 2) {
+-                        if (!AssistantSetup.hasKey(this) || !AssistService.showAssistant())
+-                            startActivity(new Intent(this, TvControlActivity.class).putExtra("voice_setup", true));
+-                    } else launch(new Intent(this, TvControlActivity.class));
++                        try {
++                            startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
++                        } catch (ActivityNotFoundException unavailable) {
++                            startActivity(new Intent(Settings.ACTION_SETTINGS));
++                        }
++                    } else openQuickSettings();
+                 });
+         nav.select(0);
++        nav.button(3).setContentDescription("Quick settings");
+         bar.addView(nav, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END | Gravity.TOP));
+         return bar;
+     }
+@@ -474,13 +619,24 @@ public class HomeActivity extends Activity {
+ 
+     private static final int DOCK_SIZE = 6;
+     /** Never in the dock: settings, the stock home screen and system helpers. */
+-    private static final java.util.Set<String> NOT_IN_DOCK = new java.util.HashSet<>(java.util.Arrays.asList(
++    static final java.util.Set<String> NOT_IN_DOCK = new java.util.HashSet<>(java.util.Arrays.asList(
+             "com.android.tv.settings", "com.google.android.apps.tv.launcherx", "com.google.android.tungsten.setupwraith",
+             "com.google.android.katniss", "com.android.vending", "com.android.systemui"));
+ 
+     /** The dock: most-used apps of the last 14 days (left = most used), topped up from the TV's other installed apps. */
+     private List<String> dockApps() {
+         List<String> out = new ArrayList<>();
++        String manual = LauncherPrefs.getDockApps(this);
++        if (manual != null) {
++            if (!manual.isEmpty()) {
++                for (String pkg : manual.split(",")) {
++                    if (out.size() >= DOCK_SIZE) break;
++                    if (launchIntent(pkg) != null && !out.contains(pkg)
++                            && !LauncherPrefs.isHidden(this, pkg)) out.add(pkg);
++                }
++            }
++            return out;
++        }
+         // Screensaver apps rack up "use" while the screensaver runs: they never count toward the dock.
+         java.util.Set<String> screensavers = new java.util.HashSet<>();
+         for (ResolveInfo r : pm.queryIntentServices(new Intent("android.service.dreams.DreamService"), 0))
+@@ -494,6 +650,7 @@ public class HomeActivity extends Activity {
+                 if (out.size() >= DOCK_SIZE || u.getTotalTimeInForeground() < 60_000) break;
+                 String pkg = u.getPackageName();
+                 if (pkg.equals(getPackageName()) || NOT_IN_DOCK.contains(pkg) || screensavers.contains(pkg) || launchIntent(pkg) == null) continue;
++                if (LauncherPrefs.isHidden(this, pkg)) continue;
+                 out.add(pkg);
+             }
+         } catch (RuntimeException ignored) {
+@@ -526,7 +683,8 @@ public class HomeActivity extends Activity {
+             for (ResolveInfo info : pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER), 0)) {
+                 String pkg = info.activityInfo.packageName;
+                 if (!out.contains(pkg) && !rest.contains(pkg) && !pkg.equals(getPackageName()) && !NOT_IN_DOCK.contains(pkg)
+-                        && !screensavers.contains(pkg) && !(devicesShown && pkg.equals(inputApp))) rest.add(pkg);
++                        && !screensavers.contains(pkg) && !(devicesShown && pkg.equals(inputApp))
++                        && !LauncherPrefs.isHidden(this, pkg)) rest.add(pkg);
+             }
+             rest.sort((a, b) -> {
+                 int byUse = Long.compare(lastUsed.getOrDefault(b, 0L), lastUsed.getOrDefault(a, 0L));
+@@ -654,12 +812,12 @@ public class HomeActivity extends Activity {
+         for (String category : new String[]{Intent.CATEGORY_LEANBACK_LAUNCHER, Intent.CATEGORY_LAUNCHER}) {
+             for (ResolveInfo info : pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(category), 0)) {
+                 String pkg = info.activityInfo.packageName;
+-                if (pkg.equals(getPackageName()) || !seen.add(pkg)) continue;
++                if (pkg.equals(getPackageName()) || LauncherPrefs.isHidden(this, pkg) || !seen.add(pkg)) continue;
+                 found.add(info);
+             }
+         }
+-        // The grid is kept between visits; rebuild only when the set of installed apps changed.
+-        String key = TextUtils.join(",", seen);
++        // The grid is kept between visits; rebuild only when the set of installed apps or hidden apps changed.
++        String key = TextUtils.join(",", seen) + "#" + TextUtils.join(",", LauncherPrefs.hiddenApps(this));
+         if (key.equals(appsKey) && appsGrid.getChildCount() > 0) return;
+         appsKey = key;
+         appsGrid.removeAllViews();
+@@ -748,6 +906,11 @@ public class HomeActivity extends Activity {
+         loader.setVisibility(View.GONE);
+         ringFrame.addView(loader, new FrameLayout.LayoutParams(dp(48), dp(48), Gravity.CENTER));
+         card.setOnClickListener(v -> pressAndLaunch(ringFrame, loader, loaderShape, intent));
++        // Long-press (hold OK) opens the tile menu: pin to the dock, app info, hide, uninstall.
++        if (device == null) card.setOnLongClickListener(v -> {
++            showTileMenu(pkg, label);
++            return true;
++        });
+ 
+         TextView caption = text(label, inDock ? 15 : 14, palette.onSurfaceVariant, 560);
+         caption.setGravity(Gravity.CENTER_HORIZONTAL);
+@@ -922,6 +1085,14 @@ public class HomeActivity extends Activity {
+     }
+ 
+     private Palette paletteFor(String pkg, Drawable art) {
++        if (!appliedDynamic) {
++            Palette fixed = paletteCache.get(appliedAccent);
++            if (fixed == null) {
++                fixed = Palette.of(appliedAccent);
++                paletteCache.put(appliedAccent, fixed);
++            }
++            return fixed;
++        }
+         Integer seed = seedCache.get(pkg);
+         if (seed == null) {
+             seed = Palette.seedFrom(art);
+@@ -1047,6 +1218,704 @@ public class HomeActivity extends Activity {
+         if (appsGrid.getChildCount() > 0) appsGrid.getChildAt(0).requestFocus();
+     }
+ 
++    // ---- quick settings ----
++
++    /** One Material 3 Expressive quick-settings tile: a round icon, bold label, and a live status line. */
++    private final class QuickTile {
++        final LinearLayout view;
++        final FrameLayout iconWrap;
++        final ImageView icon;
++        final TextView title;
++        final TextView subtitle;
++        final GradientDrawable iconShape = new GradientDrawable();
++        boolean on;
++
++        QuickTile(int iconRes, String label, String status, boolean on) {
++            this.on = on;
++            view = new LinearLayout(HomeActivity.this);
++            view.setOrientation(LinearLayout.VERTICAL);
++            view.setGravity(Gravity.TOP);
++            view.setPadding(dp(13), dp(9), dp(12), dp(8));
++            view.setFocusable(true);
++            view.setFocusableInTouchMode(true);
++            view.setClickable(true);
++            view.setDefaultFocusHighlightEnabled(false);
++
++            iconWrap = new FrameLayout(HomeActivity.this);
++            iconWrap.setBackground(iconShape);
++            icon = new ImageView(HomeActivity.this);
++            icon.setImageResource(iconRes);
++            iconWrap.addView(icon, new FrameLayout.LayoutParams(dp(17), dp(17), Gravity.CENTER));
++            view.addView(iconWrap, new LinearLayout.LayoutParams(dp(28), dp(28)));
++
++            title = text(label, 14, palette.onSurface, 700);
++            title.setIncludeFontPadding(false);
++            title.setSingleLine(true);
++            title.setEllipsize(TextUtils.TruncateAt.END);
++            LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
++                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++            titleLp.topMargin = dp(5);
++            view.addView(title, titleLp);
++
++            subtitle = text(status, 11, palette.onSurfaceVariant, 500);
++            subtitle.setIncludeFontPadding(false);
++            subtitle.setSingleLine(true);
++            subtitle.setEllipsize(TextUtils.TruncateAt.END);
++            view.addView(subtitle, new LinearLayout.LayoutParams(
++                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++
++            // No scale on focus: the tile keeps its exact Android grid cell.
++            view.setOnFocusChangeListener((v, focused) -> paint());
++            paint();
++        }
++
++        void setOn(boolean value) {
++            on = value;
++            paint();
++        }
++
++        void setSubtitle(String value) {
++            subtitle.setText(value);
++        }
++
++        void paint() {
++            boolean focused = view.hasFocus();
++            int fill;
++            int ink;
++            int sub;
++            int tint;
++            int iconFill;
++            if (on) {
++                // Android's active tile: a solid primary slab with an on-primary icon disc.
++                fill = palette.primary;
++                ink = palette.onPrimary;
++                sub = withAlpha(palette.onPrimary, 0xD0);
++                tint = palette.onPrimary;
++                iconFill = withAlpha(palette.onPrimary, 0x24);
++            } else if (focused) {
++                fill = blend(palette.containerHigh, palette.primary, 0.22f);
++                ink = palette.onSurface;
++                sub = palette.onSurfaceVariant;
++                tint = palette.primary;
++                iconFill = withAlpha(palette.primary, 0x22);
++            } else {
++                fill = palette.container;
++                ink = palette.onSurface;
++                sub = palette.onSurfaceVariant;
++                tint = palette.onSurfaceVariant;
++                iconFill = withAlpha(palette.onSurfaceVariant, 0x1F);
++            }
++            GradientDrawable bg = new GradientDrawable();
++            bg.setCornerRadius(dp(24));
++            bg.setColor(fill);
++            if (focused) bg.setStroke(dp(2), on ? palette.onPrimary : palette.primary);
++            view.setBackground(bg);
++            iconShape.setShape(GradientDrawable.OVAL);
++            iconShape.setColor(iconFill);
++            title.setTextColor(ink);
++            subtitle.setTextColor(sub);
++            icon.setImageTintList(ColorStateList.valueOf(tint));
++        }
++
++        void addTo(LinearLayout row, boolean first) {
++            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(86), 1f);
++            if (!first) lp.setMarginStart(dp(7));
++            row.addView(view, lp);
++        }
++    }
++
++    private boolean wifiConnected() {
++        try {
++            ConnectivityManager cm = getSystemService(ConnectivityManager.class);
++            if (cm == null) return false;
++            NetworkCapabilities caps = cm.getNetworkCapabilities(cm.getActiveNetwork());
++            return caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
++        } catch (RuntimeException ignored) {
++            return false;
++        }
++    }
++
++    private boolean bluetoothOn() {
++        try {
++            BluetoothManager bm = getSystemService(BluetoothManager.class);
++            BluetoothAdapter adapter = bm == null ? null : bm.getAdapter();
++            return adapter != null && adapter.isEnabled();
++        } catch (RuntimeException ignored) {
++            return false;
++        }
++    }
++
++    private boolean dndOn() {
++        NotificationManager nm = getSystemService(NotificationManager.class);
++        return nm != null && nm.getCurrentInterruptionFilter() != NotificationManager.INTERRUPTION_FILTER_ALL;
++    }
++
++    private boolean musicMuted() {
++        AudioManager am = getSystemService(AudioManager.class);
++        return am != null && am.isStreamMute(AudioManager.STREAM_MUSIC);
++    }
++
++    private View quickSlider(int iconRes, int max, int value, IntConsumer onChange, SeekBar[] holder) {
++        LinearLayout row = new LinearLayout(this);
++        row.setOrientation(LinearLayout.HORIZONTAL);
++        row.setGravity(Gravity.CENTER_VERTICAL);
++        row.setPadding(dp(13), dp(2), dp(11), dp(2));
++        row.setDefaultFocusHighlightEnabled(false);
++
++        GradientDrawable rowBg = new GradientDrawable();
++        rowBg.setCornerRadius(dp(21));
++        rowBg.setColor(palette.container);
++        row.setBackground(rowBg);
++
++        ImageView icon = new ImageView(this);
++        icon.setImageResource(iconRes);
++        icon.setImageTintList(ColorStateList.valueOf(palette.onSurfaceVariant));
++        LinearLayout.LayoutParams iconLp = new LinearLayout.LayoutParams(dp(18), dp(18));
++        iconLp.setMarginEnd(dp(10));
++        row.addView(icon, iconLp);
++
++        SeekBar bar = new SeekBar(this);
++        bar.setMax(Math.max(1, max));
++        bar.setProgress(Math.max(0, Math.min(max, value)));
++        bar.setMinimumHeight(dp(24));
++        bar.setFocusable(true);
++        bar.setFocusableInTouchMode(true);
++        bar.setDefaultFocusHighlightEnabled(false);
++        bar.setPadding(dp(2), 0, dp(2), 0);
++        bar.setProgressTintList(ColorStateList.valueOf(palette.primary));
++        bar.setThumbTintList(ColorStateList.valueOf(palette.primary));
++        bar.setProgressBackgroundTintList(ColorStateList.valueOf(withAlpha(palette.onSurfaceVariant, 0x55)));
++        TextView percent = text("", 12, palette.onSurfaceVariant, 650);
++        percent.setGravity(Gravity.END);
++        Runnable showPercent = () -> percent.setText(
++                Math.round(bar.getProgress() * 100f / Math.max(1, bar.getMax())) + "%");
++        bar.setOnFocusChangeListener((v, focused) -> {
++            rowBg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.22f) : palette.container);
++            rowBg.setStroke(focused ? dp(2) : 0, focused ? palette.primary : Color.TRANSPARENT);
++            icon.setImageTintList(ColorStateList.valueOf(focused ? palette.primary : palette.onSurfaceVariant));
++            percent.setTextColor(focused ? palette.primary : palette.onSurfaceVariant);
++        });
++        bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
++            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
++                showPercent.run();
++                if (fromUser) onChange.accept(progress);
++            }
++            @Override public void onStartTrackingTouch(SeekBar seekBar) {
++            }
++            @Override public void onStopTrackingTouch(SeekBar seekBar) {
++            }
++        });
++        row.addView(bar, new LinearLayout.LayoutParams(0, dp(30), 1f));
++        LinearLayout.LayoutParams percentLp = new LinearLayout.LayoutParams(dp(42), ViewGroup.LayoutParams.WRAP_CONTENT);
++        percentLp.setMarginStart(dp(6));
++        row.addView(percent, percentLp);
++        showPercent.run();
++        holder[0] = bar;
++        return row;
++    }
++
++    private void addQuickRow(LinearLayout parent, boolean gap, QuickTile... tiles) {
++        LinearLayout row = new LinearLayout(this);
++        row.setOrientation(LinearLayout.HORIZONTAL);
++        row.setClipChildren(false);
++        for (int i = 0; i < tiles.length; i++) tiles[i].addTo(row, i == 0);
++        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        if (gap) lp.topMargin = dp(7);
++        parent.addView(row, lp);
++    }
++
++    private void openSettingsAction(String action) {
++        closeQuickSettings();
++        try {
++            startActivity(new Intent(action));
++        } catch (ActivityNotFoundException unavailable) {
++            launch(new Intent(Settings.ACTION_SETTINGS));
++        }
++    }
++
++    private void openLauncherSettings() {
++        launch(new Intent(this, LauncherSettingsActivity.class));
++    }
++
++    /** Screen-off tile: ask the system to sleep now, then put the normal timeout back. */
++    private void turnScreenOff() {
++        int current = 600_000;
++        try {
++            current = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
++        } catch (Settings.SettingNotFoundException | RuntimeException ignored) {
++        }
++        LauncherPrefs.setScreenOffRestore(this, current);
++        try {
++            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 1500);
++        } catch (RuntimeException denied) {
++            LauncherPrefs.clearScreenOffRestore(this);
++            Toast.makeText(this, "Tidak bisa mematikan layar", Toast.LENGTH_SHORT).show();
++            return;
++        }
++        closeQuickSettings();
++        handler.removeCallbacks(restoreTimeout);
++        handler.postDelayed(restoreTimeout, 15_000);
++    }
++
++    private void restoreScreenTimeout() {
++        int saved = LauncherPrefs.screenOffRestore(this);
++        if (saved < 0) return;
++        try {
++            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, saved);
++        } catch (RuntimeException ignored) {
++        }
++        LauncherPrefs.clearScreenOffRestore(this);
++        handler.removeCallbacks(restoreTimeout);
++    }
++
++    private void openQuickSettings() {
++        if (quickOverlay != null || rootView == null) return;
++        quickReturnFocus = getCurrentFocus();
++        // Keep the remote's focus inside the panel while it is open.
++        if (mainColumn != null) mainColumn.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
++        if (nowCard != null) nowCard.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
++
++        final FrameLayout overlay = new FrameLayout(this);
++        quickOverlay = overlay;
++        overlay.setBackgroundColor(0x99000000);
++        overlay.setClickable(true);
++        overlay.setOnClickListener(v -> closeQuickSettings());
++
++        LinearLayout panel = new LinearLayout(this);
++        panel.setOrientation(LinearLayout.VERTICAL);
++        panel.setPadding(dp(14), dp(12), dp(14), dp(12));
++        panel.setClickable(true);
++        panel.setOnClickListener(v -> {
++            // Swallow clicks inside the panel so they do not reach the dimmed launcher behind it.
++        });
++        GradientDrawable panelBg = new GradientDrawable();
++        panelBg.setCornerRadius(dp(32));
++        panelBg.setColor(withAlpha(palette.containerHigh, 0xF7));
++        panelBg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x33));
++        panel.setBackground(panelBg);
++        panel.setElevation(dp(24));
++        FrameLayout.LayoutParams panelLp = new FrameLayout.LayoutParams(
++                dp(600), ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
++        panelLp.setMargins(dp(16), dp(10), dp(16), dp(10));
++        overlay.addView(panel, panelLp);
++
++        // Android's little drag handle at the top of the shade.
++        View handle = new View(this);
++        GradientDrawable handleBg = new GradientDrawable();
++        handleBg.setCornerRadius(dp(2));
++        handleBg.setColor(withAlpha(palette.onSurfaceVariant, 0x66));
++        handle.setBackground(handleBg);
++        LinearLayout handleRow = new LinearLayout(this);
++        handleRow.setGravity(Gravity.CENTER);
++        handleRow.addView(handle, new LinearLayout.LayoutParams(dp(36), dp(4)));
++        LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        handleLp.bottomMargin = dp(8);
++        panel.addView(handleRow, handleLp);
++
++        LinearLayout header = new LinearLayout(this);
++        header.setOrientation(LinearLayout.HORIZONTAL);
++        header.setGravity(Gravity.CENTER_VERTICAL);
++        header.setPadding(0, 0, 0, dp(8));
++        LinearLayout headerLeft = new LinearLayout(this);
++        headerLeft.setOrientation(LinearLayout.VERTICAL);
++        quickTime = text(Dates.time(new Date()), 28, palette.onSurface, 760);
++        quickTime.setIncludeFontPadding(false);
++        headerLeft.addView(quickTime, match());
++        quickDate = text(Dates.date(new Date()), 11, palette.onSurfaceVariant, 500);
++        quickDate.setIncludeFontPadding(false);
++        headerLeft.addView(quickDate, match());
++        header.addView(headerLeft, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
++        TextView headerTitle = text("Quick settings", 11, palette.onSurfaceVariant, 650);
++        headerTitle.setGravity(Gravity.END);
++        header.addView(headerTitle, new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++        panel.addView(header, new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++
++        boolean wifi = wifiConnected();
++        QuickTile wifiTile = new QuickTile(R.drawable.ic_wifi, "Wi-Fi", wifi ? connectedWifiName() : "Off", wifi);
++        wifiTile.view.setOnClickListener(v -> {
++            boolean next = !wifiTile.on;
++            boolean changed = false;
++            try {
++                WifiManager wm = getSystemService(WifiManager.class);
++                changed = wm != null && wm.setWifiEnabled(next);
++            } catch (RuntimeException ignored) {
++                // Android TV reserves this for system apps.
++            }
++            if (changed) {
++                wifiTile.setOn(next);
++                wifiTile.setSubtitle(next ? connectedWifiName() : "Off");
++            } else {
++                // Ordinary apps cannot flip Wi-Fi on Android TV: open the system switch instead.
++                openSettingsAction(Settings.ACTION_WIFI_SETTINGS);
++            }
++        });
++
++        boolean bt = bluetoothOn();
++        QuickTile btTile = new QuickTile(R.drawable.ic_bluetooth, "Bluetooth", bt ? "On" : "Off", bt);
++        btTile.view.setOnClickListener(v -> openSettingsAction(Settings.ACTION_BLUETOOTH_SETTINGS));
++
++        boolean dnd = dndOn();
++        QuickTile dndTile = new QuickTile(R.drawable.ic_dnd, "Do not disturb", dnd ? "On" : "Off", dnd);
++        dndTile.view.setOnClickListener(v -> {
++            NotificationManager nm = getSystemService(NotificationManager.class);
++            if (nm == null) return;
++            boolean next = !dndTile.on;
++            try {
++                nm.setInterruptionFilter(next
++                        ? NotificationManager.INTERRUPTION_FILTER_NONE
++                        : NotificationManager.INTERRUPTION_FILTER_ALL);
++                dndTile.setOn(next);
++                dndTile.setSubtitle(next ? "On" : "Off");
++            } catch (RuntimeException denied) {
++                openSettingsAction(Settings.ACTION_SOUND_SETTINGS);
++            }
++        });
++
++        boolean muted = musicMuted();
++        QuickTile muteTile = new QuickTile(R.drawable.ic_volume_off, "Mute", muted ? "On" : "Off", muted);
++        SeekBar[] volumeBar = new SeekBar[1];
++        muteTile.view.setOnClickListener(v -> {
++            AudioManager am = getSystemService(AudioManager.class);
++            if (am == null) return;
++            boolean next = !muteTile.on;
++            am.adjustStreamVolume(AudioManager.STREAM_MUSIC,
++                    next ? AudioManager.ADJUST_MUTE : AudioManager.ADJUST_UNMUTE, 0);
++            muteTile.setOn(next);
++            muteTile.setSubtitle(next ? "On" : "Off");
++            if (volumeBar[0] != null) volumeBar[0].setProgress(am.getStreamVolume(AudioManager.STREAM_MUSIC));
++        });
++
++        QuickTile saverTile = new QuickTile(R.drawable.ic_screensaver, "Screensaver", "Material Clock", false);
++        saverTile.view.setOnClickListener(v -> {
++            closeQuickSettings();
++            launch(new Intent(this, ScreensaverActivity.class));
++        });
++
++        QuickTile appsTile = new QuickTile(R.drawable.ic_apps, "Apps", "All apps", false);
++        appsTile.view.setOnClickListener(v -> {
++            closeQuickSettings();
++            showApps();
++        });
++
++        QuickTile offTile = new QuickTile(R.drawable.ic_screen_off, "Layar mati", "Matikan tampilan", false);
++        offTile.view.setOnClickListener(v -> turnScreenOff());
++
++        QuickTile launcherTile = new QuickTile(R.drawable.ic_tune, "Launcher", "Sapaan & tema", false);
++        launcherTile.view.setOnClickListener(v -> {
++            closeQuickSettings();
++            openLauncherSettings();
++        });
++
++        QuickTile settingsTile = new QuickTile(R.drawable.ic_settings, "Pengaturan TV", "Semua setelan", false);
++        settingsTile.view.setOnClickListener(v -> openSettingsAction(Settings.ACTION_SETTINGS));
++
++        // Brightness first, like the Android shade; the volume pill sits just under it.
++        int brightnessNow;
++        try {
++            brightnessNow = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
++        } catch (Settings.SettingNotFoundException missing) {
++            brightnessNow = 128;
++        }
++        View brightness = quickSlider(R.drawable.ic_brightness, 255, brightnessNow, value -> {
++            try {
++                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE,
++                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
++                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, value);
++            } catch (RuntimeException ignored) {
++                // WRITE_SETTINGS is not granted; the slider still reflects the current level.
++            }
++        }, new SeekBar[1]);
++        LinearLayout.LayoutParams brightnessLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, dp(42));
++        panel.addView(brightness, brightnessLp);
++
++        AudioManager am = getSystemService(AudioManager.class);
++        int volumeMax = am == null ? 1 : Math.max(1, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
++        int volumeNow = am == null ? 0 : am.getStreamVolume(AudioManager.STREAM_MUSIC);
++        View volume = quickSlider(R.drawable.ic_volume, volumeMax, volumeNow, value -> {
++            AudioManager audio = getSystemService(AudioManager.class);
++            if (audio != null) audio.setStreamVolume(AudioManager.STREAM_MUSIC, value, 0);
++        }, volumeBar);
++        LinearLayout.LayoutParams volumeLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, dp(42));
++        volumeLp.topMargin = dp(6);
++        panel.addView(volume, volumeLp);
++
++        LinearLayout grid = new LinearLayout(this);
++        grid.setOrientation(LinearLayout.VERTICAL);
++        addQuickRow(grid, false, wifiTile, btTile, dndTile);
++        addQuickRow(grid, true, muteTile, saverTile, offTile);
++        addQuickRow(grid, true, appsTile, launcherTile, settingsTile);
++        LinearLayout.LayoutParams gridLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        gridLp.topMargin = dp(8);
++        panel.addView(grid, gridLp);
++
++        TextView dockApps = quickFooterButton("Dock apps", R.drawable.ic_apps);
++        dockApps.setOnClickListener(v -> {
++            closeQuickSettings();
++            openDockSettings();
++        });
++        TextView closePanel = quickFooterButton("Tutup", 0);
++        closePanel.setOnClickListener(v -> closeQuickSettings());
++        LinearLayout footer = new LinearLayout(this);
++        footer.setOrientation(LinearLayout.HORIZONTAL);
++        footer.setGravity(Gravity.CENTER_VERTICAL);
++        footer.addView(dockApps, new LinearLayout.LayoutParams(0, dp(40), 1f));
++        View footerGap = new View(this);
++        footer.addView(footerGap, new LinearLayout.LayoutParams(dp(8), dp(1)));
++        footer.addView(closePanel, new LinearLayout.LayoutParams(0, dp(40), 1f));
++        LinearLayout.LayoutParams footerLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        footerLp.topMargin = dp(8);
++        panel.addView(footer, footerLp);
++
++        rootView.addView(overlay, match());
++        overlay.setAlpha(0f);
++        panel.setTranslationY(-dp(22));
++        overlay.animate().alpha(1f).setDuration(Motion.FAST_EFFECTS_MS).start();
++        panel.animate().translationY(0f).setDuration(Motion.DEFAULT_SPATIAL_MS)
++                .setInterpolator(Motion.DEFAULT_SPATIAL).start();
++        handler.removeCallbacks(quickTick);
++        handler.post(quickTick);
++        wifiTile.view.requestFocus();
++    }
++
++    private TextView quickFooterButton(String label, int iconRes) {
++        TextView b = text(label, 13, palette.onSurface, 650);
++        if (iconRes != 0) {
++            Drawable icon = getDrawable(iconRes);
++            if (icon != null) {
++                icon.setBounds(0, 0, dp(18), dp(18));
++                icon.setTintList(ColorStateList.valueOf(palette.onSurface));
++                b.setCompoundDrawablesRelative(icon, null, null, null);
++                b.setCompoundDrawablePadding(dp(8));
++            }
++        }
++        b.setGravity(Gravity.CENTER);
++        b.setPadding(dp(12), 0, dp(12), 0);
++        b.setFocusable(true);
++        b.setFocusableInTouchMode(true);
++        b.setClickable(true);
++        b.setDefaultFocusHighlightEnabled(false);
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(20));
++        bg.setColor(palette.container);
++        bg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x22));
++        b.setBackground(bg);
++        b.setOnFocusChangeListener((v, focused) -> {
++            bg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.22f) : palette.container);
++            bg.setStroke(focused ? dp(2) : dp(1),
++                    focused ? palette.primary : withAlpha(palette.onSurfaceVariant, 0x22));
++            b.setTextColor(palette.onSurface);
++            if (iconRes != 0) {
++                Drawable icon = getDrawable(iconRes);
++                if (icon != null) {
++                    icon.setBounds(0, 0, dp(18), dp(18));
++                    icon.setTintList(ColorStateList.valueOf(focused ? palette.primary : palette.onSurface));
++                    b.setCompoundDrawablesRelative(icon, null, null, null);
++                }
++            }
++        });
++        return b;
++    }
++
++    private void openDockSettings() {
++        List<String> current = new ArrayList<>();
++        for (String key : dockApps()) {
++            if (launchIntent(key) != null) current.add(key);
++        }
++        Intent intent = new Intent(this, DockAppsActivity.class);
++        intent.putExtra("seed", palette.seed);
++        intent.putExtra("current", current.toArray(new String[0]));
++        launch(intent);
++    }
++
++    // ---- tile menu (hold OK) ----
++
++    private void showTileMenu(String pkg, CharSequence label) {
++        if (tileMenu != null || rootView == null) return;
++        tileMenuReturnFocus = getCurrentFocus();
++        if (mainColumn != null) mainColumn.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
++        if (nowCard != null) nowCard.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
++
++        FrameLayout overlay = new FrameLayout(this);
++        tileMenu = overlay;
++        overlay.setBackgroundColor(0x99000000);
++        overlay.setClickable(true);
++        overlay.setOnClickListener(v -> closeTileMenu());
++
++        LinearLayout panel = new LinearLayout(this);
++        panel.setOrientation(LinearLayout.VERTICAL);
++        panel.setPadding(dp(16), dp(14), dp(16), dp(14));
++        panel.setClickable(true);
++        panel.setOnClickListener(v -> {
++            // Keep taps inside the menu from reaching the dimmed launcher.
++        });
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(24));
++        bg.setColor(withAlpha(palette.containerHigh, 0xF7));
++        bg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x33));
++        panel.setBackground(bg);
++        panel.setElevation(dp(24));
++        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
++                dp(340), ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
++        overlay.addView(panel, lp);
++
++        TextView title = text(label, 20, palette.onSurface, 760);
++        title.setIncludeFontPadding(false);
++        title.setSingleLine(true);
++        title.setEllipsize(TextUtils.TruncateAt.END);
++        panel.addView(title, match());
++        TextView sub = text("Tahan OK untuk menu ini", 10, palette.onSurfaceVariant, 500);
++        sub.setPadding(0, dp(3), 0, dp(10));
++        panel.addView(sub, match());
++
++        boolean pinned = dockApps().contains(pkg);
++        TextView pin = menuButton(pinned ? "Lepas dari dock" : "Sematkan ke dock");
++        pin.setOnClickListener(v -> {
++            closeTileMenu();
++            toggleDockPin(pkg);
++        });
++        panel.addView(pin, menuLp(false));
++
++        TextView info = menuButton("Info aplikasi");
++        info.setOnClickListener(v -> {
++            closeTileMenu();
++            launch(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
++                    Uri.fromParts("package", pkg, null)));
++        });
++        panel.addView(info, menuLp(false));
++
++        TextView hide = menuButton("Sembunyikan dari Home");
++        hide.setOnClickListener(v -> {
++            closeTileMenu();
++            LauncherPrefs.hideApp(this, pkg);
++            fillDock();
++            if (showingApps) {
++                fillApps();
++                if (appsGrid.getChildCount() > 0) appsGrid.getChildAt(0).requestFocus();
++            }
++            Toast.makeText(this, "Disembunyikan dari Home", Toast.LENGTH_SHORT).show();
++        });
++        panel.addView(hide, menuLp(false));
++
++        if (!isSystemApp(pkg)) {
++            TextView uninstall = menuButton("Copot pemasangan");
++            uninstall.setOnClickListener(v -> {
++                closeTileMenu();
++                launch(new Intent(Intent.ACTION_DELETE, Uri.fromParts("package", pkg, null)));
++            });
++            panel.addView(uninstall, menuLp(false));
++        }
++
++        TextView cancel = menuButton("Batal");
++        cancel.setOnClickListener(v -> closeTileMenu());
++        panel.addView(cancel, menuLp(true));
++
++        rootView.addView(overlay, match());
++        overlay.setAlpha(0f);
++        panel.setScaleX(0.94f);
++        panel.setScaleY(0.94f);
++        overlay.animate().alpha(1f).setDuration(Motion.FAST_EFFECTS_MS).start();
++        panel.animate().scaleX(1f).scaleY(1f).setDuration(Motion.FAST_SPATIAL_MS)
++                .setInterpolator(Motion.FAST_SPATIAL).start();
++        pin.requestFocus();
++    }
++
++    private LinearLayout.LayoutParams menuLp(boolean last) {
++        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        lp.topMargin = last ? dp(8) : dp(5);
++        return lp;
++    }
++
++    private TextView menuButton(String label) {
++        TextView b = text(label, 14, palette.onSurface, 600);
++        b.setGravity(Gravity.CENTER);
++        b.setPadding(dp(12), dp(9), dp(12), dp(9));
++        b.setFocusable(true);
++        b.setFocusableInTouchMode(false);
++        b.setClickable(true);
++        b.setDefaultFocusHighlightEnabled(false);
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(16));
++        bg.setColor(palette.container);
++        bg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x22));
++        b.setBackground(bg);
++        b.setOnFocusChangeListener((v, focused) -> {
++            bg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.18f) : palette.container);
++            bg.setStroke(focused ? dp(2) : dp(1),
++                    focused ? palette.primary : withAlpha(palette.onSurfaceVariant, 0x22));
++        });
++        return b;
++    }
++
++    private void closeTileMenu() {
++        if (tileMenu == null) return;
++        FrameLayout overlay = tileMenu;
++        tileMenu = null;
++        if (mainColumn != null) mainColumn.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
++        if (nowCard != null) nowCard.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
++        if (rootView != null) {
++            overlay.animate().alpha(0f).setDuration(Motion.FAST_EFFECTS_MS)
++                    .withEndAction(() -> rootView.removeView(overlay)).start();
++        }
++        if (tileMenuReturnFocus != null) {
++            tileMenuReturnFocus.requestFocus();
++            tileMenuReturnFocus = null;
++        }
++    }
++
++    private void toggleDockPin(String pkg) {
++        List<String> dockNow = new ArrayList<>(dockApps());
++        if (dockNow.remove(pkg)) {
++            LauncherPrefs.setDockApps(this, dockNow);
++            Toast.makeText(this, "Dilepas dari dock", Toast.LENGTH_SHORT).show();
++        } else {
++            if (dockNow.size() >= DOCK_SIZE) {
++                Toast.makeText(this, "Dock penuh (6 aplikasi)", Toast.LENGTH_SHORT).show();
++                return;
++            }
++            dockNow.add(pkg);
++            LauncherPrefs.setDockApps(this, dockNow);
++            Toast.makeText(this, "Disematkan ke dock", Toast.LENGTH_SHORT).show();
++        }
++        fillDock();
++    }
++
++    private boolean isSystemApp(String pkg) {
++        try {
++            ApplicationInfo ai = pm.getApplicationInfo(pkg, 0);
++            return (ai.flags & (ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0;
++        } catch (PackageManager.NameNotFoundException e) {
++            return true;
++        }
++    }
++
++    private void closeQuickSettings() {
++        if (quickOverlay == null) return;
++        handler.removeCallbacks(quickTick);
++        quickTime = null;
++        quickDate = null;
++        FrameLayout overlay = quickOverlay;
++        quickOverlay = null;
++        if (mainColumn != null) mainColumn.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
++        if (nowCard != null) nowCard.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
++        if (rootView != null) {
++            overlay.animate().alpha(0f).setDuration(Motion.FAST_EFFECTS_MS)
++                    .withEndAction(() -> rootView.removeView(overlay)).start();
++        }
++        if (quickReturnFocus != null) {
++            quickReturnFocus.requestFocus();
++            quickReturnFocus = null;
++        }
++    }
++
+     // ---- Now Playing ----
+ 
+     private View buildNowPlaying() {
+@@ -1090,6 +1959,15 @@ public class HomeActivity extends Activity {
+         words.addView(nowProgress, pl);
+         card.addView(words, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+ 
++        nowPrev = skipButton(R.drawable.ic_skip_previous, "Sebelumnya", -1);
++        nowNext = skipButton(R.drawable.ic_skip_next, "Berikutnya", 1);
++        LinearLayout.LayoutParams prevLp = new LinearLayout.LayoutParams(dp(36), dp(36));
++        prevLp.setMarginEnd(dp(4));
++        card.addView(nowPrev, prevLp);
++        LinearLayout.LayoutParams nextLp = new LinearLayout.LayoutParams(dp(36), dp(36));
++        nextLp.setMarginEnd(dp(6));
++        card.addView(nowNext, nextLp);
++
+         nowButton = new ImageView(this);
+         nowButton.setScaleType(ImageView.ScaleType.CENTER);
+         nowButtonShape = new GradientDrawable();
+@@ -1114,11 +1992,48 @@ public class HomeActivity extends Activity {
+         boolean focused = nowButton.hasFocus();
+         nowButtonShape.setColor(focused ? palette.inverseSurface : palette.primary);
+         nowButton.setImageTintList(ColorStateList.valueOf(focused ? palette.inverseOnSurface : palette.onPrimary));
++        if (nowPrev != null) {
++            boolean f = nowPrev.hasFocus();
++            nowPrevShape.setColor(f ? palette.inverseSurface : palette.containerHigh);
++            nowPrev.setImageTintList(ColorStateList.valueOf(f ? palette.inverseOnSurface : palette.onSurface));
++        }
++        if (nowNext != null) {
++            boolean f = nowNext.hasFocus();
++            nowNextShape.setColor(f ? palette.inverseSurface : palette.containerHigh);
++            nowNext.setImageTintList(ColorStateList.valueOf(f ? palette.inverseOnSurface : palette.onSurface));
++        }
+         nowTitle.setTextColor(palette.onSurface);
+         nowArtist.setTextColor(palette.onSurfaceVariant);
+         nowProgress.setColors(palette.primary, withAlpha(palette.onSurfaceVariant, 0x55));
+     }
+ 
++    private ImageView skipButton(int iconRes, String description, int direction) {
++        ImageView b = new ImageView(this);
++        b.setImageResource(iconRes);
++        b.setScaleType(ImageView.ScaleType.CENTER);
++        GradientDrawable shape = new GradientDrawable();
++        shape.setShape(GradientDrawable.OVAL);
++        shape.setColor(palette.containerHigh);
++        b.setBackground(shape);
++        b.setFocusable(true);
++        b.setClickable(true);
++        b.setContentDescription(description);
++        b.setOnClickListener(v -> skip(direction));
++        b.setOnFocusChangeListener((v, focused) -> {
++            v.animate().scaleX(focused ? 1.12f : 1f).scaleY(focused ? 1.12f : 1f)
++                    .setInterpolator(Motion.FAST_SPATIAL).setDuration(Motion.FAST_SPATIAL_MS).start();
++            styleNowPlaying();
++        });
++        if (direction < 0) nowPrevShape = shape; else nowNextShape = shape;
++        return b;
++    }
++
++    private void skip(int direction) {
++        if (playing == null) return;
++        if (direction < 0) playing.getTransportControls().skipToPrevious();
++        else playing.getTransportControls().skipToNext();
++    }
++
+     private void startNowPlaying() {
+         try {
+             if (sessions == null) {
+@@ -1287,6 +2202,9 @@ public class HomeActivity extends Activity {
+         nowProgress.setVisibility(lastDuration > 0 ? View.VISIBLE : View.GONE);
+         nowProgress.setState(st.getPosition(), st.getLastPositionUpdateTime(), st.getPlaybackSpeed(), lastDuration, running);
+         nowButton.setImageResource(running ? R.drawable.ic_pause : R.drawable.ic_play);
++        long actions = st.getActions();
++        nowPrev.setVisibility((actions & PlaybackState.ACTION_SKIP_TO_PREVIOUS) != 0 ? View.VISIBLE : View.GONE);
++        nowNext.setVisibility((actions & PlaybackState.ACTION_SKIP_TO_NEXT) != 0 ? View.VISIBLE : View.GONE);
+         styleNowPlaying();
+         // Cancel a pending fade-out first: its end action would otherwise hide the card again.
+         nowCard.animate().cancel();
+@@ -1385,6 +2303,8 @@ public class HomeActivity extends Activity {
+         nowProgress.setState(rememberedPosition(), android.os.SystemClock.elapsedRealtime(), 0f, lastDuration, false);
+         // Never fake it: the pause icon appears only once a session reports playing again (through showNowPlaying).
+         nowButton.setImageResource(R.drawable.ic_play);
++        nowPrev.setVisibility(View.GONE);
++        nowNext.setVisibility(View.GONE);
+         styleNowPlaying();
+         nowCard.animate().cancel();
+         if (nowCard.getVisibility() != View.VISIBLE || nowCard.getAlpha() < 1f) {
+@@ -1555,6 +2475,15 @@ public class HomeActivity extends Activity {
+         return (color & 0x00FFFFFF) | (alpha << 24);
+     }
+ 
++    /** Opaque mix of two colors; amount is 0..1 toward overlay. */
++    private static int blend(int base, int overlay, float amount) {
++        float keep = 1f - amount;
++        int r = Math.round(Color.red(base) * keep + Color.red(overlay) * amount);
++        int g = Math.round(Color.green(base) * keep + Color.green(overlay) * amount);
++        int b = Math.round(Color.blue(base) * keep + Color.blue(overlay) * amount);
++        return Color.argb(255, r, g, b);
++    }
++
+     private FrameLayout.LayoutParams match() {
+         return new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+     }
+diff --git a/src/com/rampey/materialtv/LauncherPrefs.java b/src/com/rampey/materialtv/LauncherPrefs.java
+new file mode 100644
+index 0000000..61aab8e
+--- /dev/null
++++ b/src/com/rampey/materialtv/LauncherPrefs.java
+@@ -0,0 +1,135 @@
++package com.rampey.materialtv;
++
++import android.content.Context;
++import android.content.SharedPreferences;
++import android.text.TextUtils;
++
++import java.util.ArrayList;
++import java.util.LinkedHashSet;
++import java.util.List;
++import java.util.Set;
++
++/** Small shared preference store for launcher settings that survive restarts. */
++final class LauncherPrefs {
++    private static final String NAME = "launcher";
++    private static final String DOCK_APPS = "dock_apps";
++    private static final String GREETING_NAME = "greeting_name";
++    private static final String GREETING_ON = "greeting_on";
++    private static final String ACCENT_SEED = "accent_seed";
++    private static final String DYNAMIC_COLOR = "dynamic_color";
++    private static final String SCREENSAVER_STYLE = "screensaver_style";
++    private static final String HIDDEN_APPS = "hidden_apps";
++    private static final String SCREEN_OFF_RESTORE = "screen_off_restore";
++
++    static final String DEFAULT_GREETING_NAME = "Nafil Julio Firmansyah";
++
++    private LauncherPrefs() {
++    }
++
++    private static SharedPreferences prefs(Context context) {
++        return context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
++    }
++
++    /** Null means automatic (most-used apps); an empty string means the user picked nothing. */
++    static String getDockApps(Context context) {
++        return prefs(context).getString(DOCK_APPS, null);
++    }
++
++    static void setDockApps(Context context, List<String> packages) {
++        prefs(context).edit().putString(DOCK_APPS, TextUtils.join(",", packages)).apply();
++    }
++
++    static void clearDockApps(Context context) {
++        prefs(context).edit().remove(DOCK_APPS).apply();
++    }
++
++    static String greetingName(Context context) {
++        return prefs(context).getString(GREETING_NAME, DEFAULT_GREETING_NAME);
++    }
++
++    static void setGreetingName(Context context, String name) {
++        prefs(context).edit().putString(GREETING_NAME, name == null ? "" : name.trim()).apply();
++    }
++
++    static boolean greetingOn(Context context) {
++        return prefs(context).getBoolean(GREETING_ON, true);
++    }
++
++    static void setGreetingOn(Context context, boolean on) {
++        prefs(context).edit().putBoolean(GREETING_ON, on).apply();
++    }
++
++    static int accentSeed(Context context) {
++        return prefs(context).getInt(ACCENT_SEED, Palette.DEFAULT_SEED);
++    }
++
++    static void setAccentSeed(Context context, int seed) {
++        prefs(context).edit().putInt(ACCENT_SEED, seed).apply();
++    }
++
++    static boolean dynamicColor(Context context) {
++        return prefs(context).getBoolean(DYNAMIC_COLOR, true);
++    }
++
++    static void setDynamicColor(Context context, boolean on) {
++        prefs(context).edit().putBoolean(DYNAMIC_COLOR, on).apply();
++    }
++
++    /** 0 = shapes + clock, 1 = clock only, 2 = dark clock. */
++    static int screensaverStyle(Context context) {
++        return prefs(context).getInt(SCREENSAVER_STYLE, 0);
++    }
++
++    static void setScreensaverStyle(Context context, int style) {
++        prefs(context).edit().putInt(SCREENSAVER_STYLE, Math.max(0, Math.min(2, style))).apply();
++    }
++
++    static boolean isHidden(Context context, String pkg) {
++        return hiddenSet(context).contains(pkg);
++    }
++
++    static List<String> hiddenApps(Context context) {
++        return new ArrayList<>(hiddenSet(context));
++    }
++
++    static void hideApp(Context context, String pkg) {
++        Set<String> hidden = hiddenSet(context);
++        if (hidden.add(pkg)) {
++            prefs(context).edit().putString(HIDDEN_APPS, TextUtils.join(",", hidden)).apply();
++        }
++    }
++
++    static void showApp(Context context, String pkg) {
++        Set<String> hidden = hiddenSet(context);
++        if (hidden.remove(pkg)) {
++            prefs(context).edit().putString(HIDDEN_APPS, TextUtils.join(",", hidden)).apply();
++        }
++    }
++
++    static void clearHiddenApps(Context context) {
++        prefs(context).edit().remove(HIDDEN_APPS).apply();
++    }
++
++    /** -1 when no screen-off timeout is waiting to be restored. */
++    static int screenOffRestore(Context context) {
++        return prefs(context).getInt(SCREEN_OFF_RESTORE, -1);
++    }
++
++    static void setScreenOffRestore(Context context, int timeout) {
++        prefs(context).edit().putInt(SCREEN_OFF_RESTORE, timeout).apply();
++    }
++
++    static void clearScreenOffRestore(Context context) {
++        prefs(context).edit().remove(SCREEN_OFF_RESTORE).apply();
++    }
++
++    private static Set<String> hiddenSet(Context context) {
++        Set<String> out = new LinkedHashSet<>();
++        String saved = prefs(context).getString(HIDDEN_APPS, "");
++        if (saved == null || saved.isEmpty()) return out;
++        for (String pkg : saved.split(",")) {
++            if (!pkg.isEmpty()) out.add(pkg);
++        }
++        return out;
++    }
++}
+diff --git a/src/com/rampey/materialtv/LauncherSettingsActivity.java b/src/com/rampey/materialtv/LauncherSettingsActivity.java
+new file mode 100644
+index 0000000..26d0631
+--- /dev/null
++++ b/src/com/rampey/materialtv/LauncherSettingsActivity.java
+@@ -0,0 +1,463 @@
++package com.rampey.materialtv;
++
++import android.app.Activity;
++import android.content.ActivityNotFoundException;
++import android.content.Intent;
++import android.content.pm.PackageManager;
++import android.graphics.Color;
++import android.graphics.Typeface;
++import android.graphics.drawable.GradientDrawable;
++import android.os.Bundle;
++import android.provider.Settings;
++import android.text.Editable;
++import android.text.InputType;
++import android.text.TextUtils;
++import android.text.TextWatcher;
++import android.util.TypedValue;
++import android.view.Gravity;
++import android.view.View;
++import android.view.ViewGroup;
++import android.view.inputmethod.EditorInfo;
++import android.widget.EditText;
++import android.widget.LinearLayout;
++import android.widget.ScrollView;
++import android.widget.TextView;
++import android.widget.Toast;
++
++import java.util.List;
++
++/**
++ * Launcher settings: greeting, theme, screensaver style and hidden apps. Opened from the quick-settings
++ * "Launcher" tile. Every change is saved immediately; Home re-reads the prefs when it comes back.
++ */
++public class LauncherSettingsActivity extends Activity {
++    private static final int[] SEEDS = {
++            0xFF6750A4, 0xFFB3261E, 0xFF386A20, 0xFF0061A4,
++            0xFF8B5000, 0xFF8E4585, 0xFF006A6A, 0xFF6D5E00};
++    private static final String[] SEED_NAMES = {
++            "Ungu", "Merah", "Hijau", "Biru", "Oranye", "Merah muda", "Teal", "Zaitun"};
++    private static final String[] SAVER_NAMES = {"Bentuk + jam", "Jam saja", "Gelap"};
++
++    private Palette palette;
++    private PackageManager pm;
++
++    @Override protected void onCreate(Bundle state) {
++        super.onCreate(state);
++        palette = Palette.of(LauncherPrefs.accentSeed(this));
++        pm = getPackageManager();
++        setContentView(build());
++    }
++
++    private View build() {
++        LinearLayout root = new LinearLayout(this);
++        root.setOrientation(LinearLayout.VERTICAL);
++        root.setPadding(dp(48), dp(24), dp(48), dp(18));
++        root.setBackgroundColor(palette.surface);
++
++        TextView title = text("Pengaturan launcher", 30, palette.onSurface, 760);
++        title.setIncludeFontPadding(false);
++        root.addView(title, match());
++        TextView subtitle = text("Sapaan, warna, screensaver dan aplikasi tersembunyi.", 13,
++                palette.onSurfaceVariant, 500);
++        subtitle.setPadding(0, dp(3), 0, dp(10));
++        root.addView(subtitle, match());
++
++        ScrollView scroll = new ScrollView(this);
++        scroll.setFocusable(false);
++        scroll.setClipToPadding(false);
++        LinearLayout content = new LinearLayout(this);
++        content.setOrientation(LinearLayout.VERTICAL);
++        content.setPadding(0, 0, 0, dp(16));
++        scroll.addView(content, new ScrollView.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++        root.addView(scroll, new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
++
++        buildGreeting(content);
++        buildTheme(content);
++        buildScreensaver(content);
++        buildHidden(content);
++        buildAbout(content);
++
++        TextView back = footerButton("Kembali", true);
++        back.setOnClickListener(v -> finish());
++        LinearLayout.LayoutParams backLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        backLp.topMargin = dp(10);
++        root.addView(back, backLp);
++        return root;
++    }
++
++    // ---- greeting ----
++
++    private void buildGreeting(LinearLayout parent) {
++        section(parent, "Sapaan");
++
++        EditText name = new EditText(this);
++        name.setSingleLine(true);
++        name.setText(LauncherPrefs.greetingName(this));
++        name.setHint("Nama sapaan");
++        name.setHintTextColor(withAlpha(palette.onSurfaceVariant, 0xAA));
++        name.setTextColor(palette.onSurface);
++        name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
++        name.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
++        name.setImeOptions(EditorInfo.IME_ACTION_DONE);
++        name.setPadding(dp(14), dp(8), dp(14), dp(8));
++        name.setBackground(fieldBackground(false));
++        name.setFocusable(true);
++        name.setFocusableInTouchMode(true);
++        name.setOnFocusChangeListener((v, focused) -> name.setBackground(fieldBackground(focused)));
++        name.addTextChangedListener(new TextWatcher() {
++            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
++            }
++            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
++            }
++            @Override public void afterTextChanged(Editable s) {
++                LauncherPrefs.setGreetingName(LauncherSettingsActivity.this, s.toString());
++            }
++        });
++        LinearLayout.LayoutParams nameLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        nameLp.bottomMargin = dp(7);
++        parent.addView(name, nameLp);
++
++        boolean on = LauncherPrefs.greetingOn(this);
++        View toggle = toggleRow("Tampilkan sapaan", on ? "Aktif" : "Nonaktif", on, () -> {
++            LauncherPrefs.setGreetingOn(this, !LauncherPrefs.greetingOn(this));
++            recreate();
++        });
++        parent.addView(toggle, match());
++
++        TextView reset = chip("Pakai nama bawaan", false, () -> {
++            LauncherPrefs.setGreetingName(this, LauncherPrefs.DEFAULT_GREETING_NAME);
++            recreate();
++        });
++        LinearLayout.LayoutParams resetLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        resetLp.topMargin = dp(7);
++        parent.addView(reset, resetLp);
++    }
++
++    // ---- theme ----
++
++    private void buildTheme(LinearLayout parent) {
++        section(parent, "Warna");
++        TextView hint = text("Pilih warna aksen, atau ikuti warna aplikasi yang sedang disorot.", 12,
++                palette.onSurfaceVariant, 500);
++        hint.setPadding(dp(2), 0, 0, dp(8));
++        parent.addView(hint, match());
++
++        LinearLayout row = new LinearLayout(this);
++        row.setOrientation(LinearLayout.HORIZONTAL);
++        row.setGravity(Gravity.CENTER_VERTICAL);
++        int current = LauncherPrefs.accentSeed(this);
++        for (int i = 0; i < SEEDS.length; i++) {
++            final int seed = SEEDS[i];
++            boolean selected = seed == current;
++            TextView dot = new TextView(this);
++            dot.setText(selected ? "✓" : "");
++            dot.setTextColor(0xFF000000);
++            dot.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
++            dot.setGravity(Gravity.CENTER);
++            dot.setContentDescription(SEED_NAMES[i]);
++            dot.setFocusable(true);
++            dot.setFocusableInTouchMode(false);
++            dot.setClickable(true);
++            dot.setDefaultFocusHighlightEnabled(false);
++            GradientDrawable bg = new GradientDrawable();
++            bg.setShape(GradientDrawable.OVAL);
++            bg.setColor(seed);
++            bg.setStroke(selected ? dp(3) : dp(1), selected ? palette.onSurface : withAlpha(palette.onSurface, 0x44));
++            dot.setBackground(bg);
++            dot.setOnFocusChangeListener((v, focused) -> {
++                bg.setStroke(focused ? dp(3) : selected ? dp(3) : dp(1),
++                        focused ? palette.primary : selected ? palette.onSurface : withAlpha(palette.onSurface, 0x44));
++                dot.animate().scaleX(focused ? 1.12f : 1f).scaleY(focused ? 1.12f : 1f)
++                        .setDuration(Motion.FAST_SPATIAL_MS).start();
++            });
++            dot.setOnClickListener(v -> {
++                LauncherPrefs.setAccentSeed(this, seed);
++                LauncherPrefs.setDynamicColor(this, false);
++                Toast.makeText(this, "Warna " + SEED_NAMES[indexOf(seed)] + " diterapkan", Toast.LENGTH_SHORT).show();
++                recreate();
++            });
++            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(46), dp(46));
++            if (i > 0) lp.setMarginStart(dp(9));
++            row.addView(dot, lp);
++        }
++        parent.addView(row, match());
++
++        boolean dynamic = LauncherPrefs.dynamicColor(this);
++        View toggle = toggleRow("Ikuti warna aplikasi", dynamic ? "Aktif" : "Nonaktif", dynamic, () -> {
++            LauncherPrefs.setDynamicColor(this, !LauncherPrefs.dynamicColor(this));
++            recreate();
++        });
++        LinearLayout.LayoutParams toggleLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        toggleLp.topMargin = dp(9);
++        parent.addView(toggle, toggleLp);
++    }
++
++    private static int indexOf(int seed) {
++        for (int i = 0; i < SEEDS.length; i++) if (SEEDS[i] == seed) return i;
++        return 0;
++    }
++
++    // ---- screensaver ----
++
++    private void buildScreensaver(LinearLayout parent) {
++        section(parent, "Screensaver");
++        int style = LauncherPrefs.screensaverStyle(this);
++        LinearLayout row = new LinearLayout(this);
++        row.setOrientation(LinearLayout.HORIZONTAL);
++        row.setGravity(Gravity.CENTER_VERTICAL);
++        for (int i = 0; i < SAVER_NAMES.length; i++) {
++            final int value = i;
++            TextView chip = chip(SAVER_NAMES[i], i == style, () -> {
++                LauncherPrefs.setScreensaverStyle(this, value);
++                recreate();
++            });
++            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
++            if (i > 0) lp.setMarginStart(dp(8));
++            row.addView(chip, lp);
++        }
++        parent.addView(row, match());
++
++        LinearLayout buttons = new LinearLayout(this);
++        buttons.setOrientation(LinearLayout.HORIZONTAL);
++        buttons.setGravity(Gravity.CENTER_VERTICAL);
++        TextView preview = chip("Pratinjau", false, () -> {
++            try {
++                startActivity(new Intent(this, ScreensaverActivity.class));
++            } catch (RuntimeException ignored) {
++            }
++        });
++        TextView idle = chip("Waktu tidur layar", false, () -> {
++            try {
++                startActivity(new Intent(Settings.ACTION_DREAM_SETTINGS));
++            } catch (ActivityNotFoundException unavailable) {
++                try {
++                    startActivity(new Intent(Settings.ACTION_DISPLAY_SETTINGS));
++                } catch (ActivityNotFoundException ignored) {
++                }
++            }
++        });
++        buttons.addView(preview, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
++        LinearLayout.LayoutParams idleLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
++        idleLp.setMarginStart(dp(8));
++        buttons.addView(idle, idleLp);
++        LinearLayout.LayoutParams buttonsLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        buttonsLp.topMargin = dp(8);
++        parent.addView(buttons, buttonsLp);
++    }
++
++    // ---- hidden apps ----
++
++    private void buildHidden(LinearLayout parent) {
++        section(parent, "Aplikasi disembunyikan");
++        List<String> hidden = LauncherPrefs.hiddenApps(this);
++        if (hidden.isEmpty()) {
++            TextView empty = text("Tidak ada aplikasi disembunyikan. Tahan OK pada ubin untuk menyembunyikan.",
++                    12, palette.onSurfaceVariant, 500);
++            empty.setPadding(dp(2), 0, 0, dp(2));
++            parent.addView(empty, match());
++            return;
++        }
++        for (String pkg : hidden) {
++            LinearLayout row = new LinearLayout(this);
++            row.setOrientation(LinearLayout.HORIZONTAL);
++            row.setGravity(Gravity.CENTER_VERTICAL);
++            row.setPadding(dp(14), dp(7), dp(10), dp(7));
++            GradientDrawable bg = new GradientDrawable();
++            bg.setCornerRadius(dp(14));
++            bg.setColor(palette.container);
++            bg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x22));
++            row.setBackground(bg);
++
++            TextView label = text(appLabel(pkg), 15, palette.onSurface, 550);
++            label.setSingleLine(true);
++            label.setEllipsize(TextUtils.TruncateAt.END);
++            row.addView(label, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
++
++            TextView show = chip("Tampilkan", false, () -> {
++                LauncherPrefs.showApp(this, pkg);
++                recreate();
++            });
++            row.addView(show, new LinearLayout.LayoutParams(
++                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
++                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++            lp.bottomMargin = dp(6);
++            parent.addView(row, lp);
++        }
++        TextView all = chip("Tampilkan semua", false, () -> {
++            LauncherPrefs.clearHiddenApps(this);
++            recreate();
++        });
++        LinearLayout.LayoutParams allLp = new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++        allLp.topMargin = dp(3);
++        parent.addView(all, allLp);
++    }
++
++    private CharSequence appLabel(String pkg) {
++        try {
++            return pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0));
++        } catch (PackageManager.NameNotFoundException e) {
++            return pkg;
++        }
++    }
++
++    private void buildAbout(LinearLayout parent) {
++        String version = "";
++        try {
++            version = pm.getPackageInfo(getPackageName(), 0).versionName;
++        } catch (PackageManager.NameNotFoundException ignored) {
++        }
++        TextView about = text("ianvex tv launcher " + version, 11, palette.onSurfaceVariant, 500);
++        about.setPadding(dp(2), dp(14), 0, 0);
++        parent.addView(about, match());
++    }
++
++    // ---- pieces ----
++
++    private void section(LinearLayout parent, String title) {
++        TextView label = text(title, 15, palette.primary, 700);
++        label.setPadding(dp(2), dp(14), 0, dp(7));
++        parent.addView(label, match());
++    }
++
++    private View toggleRow(String title, String status, boolean on, Runnable action) {
++        LinearLayout row = new LinearLayout(this);
++        row.setOrientation(LinearLayout.HORIZONTAL);
++        row.setGravity(Gravity.CENTER_VERTICAL);
++        row.setPadding(dp(14), dp(10), dp(14), dp(10));
++        row.setFocusable(true);
++        row.setFocusableInTouchMode(false);
++        row.setClickable(true);
++        row.setDefaultFocusHighlightEnabled(false);
++
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(14));
++        row.setBackground(bg);
++
++        TextView label = text(title, 15, palette.onSurface, 600);
++        row.addView(label, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
++        TextView value = text(status, 13, on ? palette.primary : palette.onSurfaceVariant, 700);
++        row.addView(value, new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++
++        Runnable paint = () -> {
++            boolean focused = row.hasFocus();
++            bg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.18f)
++                    : on ? palette.containerHigh : palette.container);
++            bg.setStroke(focused ? dp(2) : dp(1),
++                    focused ? palette.primary : on ? withAlpha(palette.primary, 0x66)
++                            : withAlpha(palette.onSurfaceVariant, 0x22));
++            value.setTextColor(on ? palette.primary : palette.onSurfaceVariant);
++        };
++        row.setOnFocusChangeListener((v, focused) -> paint.run());
++        row.setOnClickListener(v -> action.run());
++        paint.run();
++        return row;
++    }
++
++    private TextView chip(String label, boolean selected, Runnable action) {
++        TextView b = text(label, 13, selected ? palette.onPrimary : palette.onSurface, 650);
++        b.setGravity(Gravity.CENTER);
++        b.setPadding(dp(14), dp(10), dp(14), dp(10));
++        b.setSingleLine(true);
++        b.setEllipsize(TextUtils.TruncateAt.END);
++        b.setFocusable(true);
++        b.setFocusableInTouchMode(false);
++        b.setClickable(true);
++        b.setDefaultFocusHighlightEnabled(false);
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(18));
++        bg.setColor(selected ? palette.primary : palette.container);
++        bg.setStroke(selected ? dp(2) : dp(1),
++                selected ? palette.onPrimary : withAlpha(palette.onSurfaceVariant, 0x22));
++        b.setBackground(bg);
++        b.setOnFocusChangeListener((v, focused) -> {
++            bg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.20f)
++                    : selected ? palette.primary : palette.container);
++            bg.setStroke(focused ? dp(2) : selected ? dp(2) : dp(1),
++                    focused ? palette.primary : selected ? palette.onPrimary
++                            : withAlpha(palette.onSurfaceVariant, 0x22));
++            b.setTextColor(focused ? palette.onSurface : selected ? palette.onPrimary : palette.onSurface);
++        });
++        b.setOnClickListener(v -> action.run());
++        return b;
++    }
++
++    private TextView footerButton(String label, boolean filled) {
++        TextView b = text(label, 15, filled ? palette.onPrimary : palette.onSurface, 650);
++        b.setGravity(Gravity.CENTER);
++        b.setPadding(dp(18), dp(11), dp(18), dp(11));
++        b.setFocusable(true);
++        b.setFocusableInTouchMode(false);
++        b.setClickable(true);
++        b.setDefaultFocusHighlightEnabled(false);
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(20));
++        bg.setColor(filled ? palette.primary : palette.container);
++        if (!filled) bg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x22));
++        b.setBackground(bg);
++        b.setOnFocusChangeListener((v, focused) -> {
++            if (filled) {
++                bg.setColor(focused ? blend(palette.primary, palette.onPrimary, 0.14f) : palette.primary);
++                bg.setStroke(focused ? dp(2) : 0, palette.onPrimary);
++            } else {
++                bg.setColor(focused ? blend(palette.containerHigh, palette.primary, 0.18f) : palette.container);
++                bg.setStroke(focused ? dp(2) : dp(1),
++                        focused ? palette.primary : withAlpha(palette.onSurfaceVariant, 0x22));
++            }
++        });
++        return b;
++    }
++
++    private GradientDrawable fieldBackground(boolean focused) {
++        GradientDrawable bg = new GradientDrawable();
++        bg.setCornerRadius(dp(14));
++        bg.setColor(palette.container);
++        bg.setStroke(focused ? dp(2) : dp(1),
++                focused ? palette.primary : withAlpha(palette.onSurfaceVariant, 0x33));
++        return bg;
++    }
++
++    private TextView text(CharSequence value, float sp, int color, int weight) {
++        TextView t = new TextView(this);
++        t.setText(value);
++        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
++        t.setTextColor(color);
++        try {
++            t.setTypeface(new Typeface.Builder(getAssets(), "fonts/GoogleSansFlex.ttf")
++                    .setFontVariationSettings("'wght' " + weight + ", 'opsz' 24, 'ROND' 0").build());
++        } catch (RuntimeException ignored) {
++        }
++        return t;
++    }
++
++    private static int withAlpha(int color, int alpha) {
++        return (color & 0x00FFFFFF) | (alpha << 24);
++    }
++
++    private static int blend(int base, int overlay, float amount) {
++        float keep = 1f - amount;
++        int r = Math.round(Color.red(base) * keep + Color.red(overlay) * amount);
++        int g = Math.round(Color.green(base) * keep + Color.green(overlay) * amount);
++        int b = Math.round(Color.blue(base) * keep + Color.blue(overlay) * amount);
++        return Color.argb(255, r, g, b);
++    }
++
++    private LinearLayout.LayoutParams match() {
++        return new LinearLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
++    }
++
++    private int dp(float value) {
++        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value,
++                getResources().getDisplayMetrics()));
++    }
++}
+diff --git a/src/com/rampey/materialtv/Palette.java b/src/com/rampey/materialtv/Palette.java
+index ba24a3b..bd866cf 100644
+--- a/src/com/rampey/materialtv/Palette.java
++++ b/src/com/rampey/materialtv/Palette.java
+@@ -32,6 +32,7 @@ final class Palette {
+     final int primary;          // accents
+     final int onPrimary;
+     final int primaryContainer; // the large background shape
++    final int onPrimaryContainer;
+     final int onSurface;
+     final int onSurfaceVariant;
+     final int inverseSurface;   // focused fill
+@@ -47,6 +48,7 @@ final class Palette {
+         primary = ROLES.primary().getArgb(s);
+         onPrimary = ROLES.onPrimary().getArgb(s);
+         primaryContainer = ROLES.primaryContainer().getArgb(s);
++        onPrimaryContainer = ROLES.onPrimaryContainer().getArgb(s);
+         onSurface = ROLES.onSurface().getArgb(s);
+         onSurfaceVariant = ROLES.onSurfaceVariant().getArgb(s);
+         inverseSurface = ROLES.inverseSurface().getArgb(s);
+diff --git a/src/com/rampey/materialtv/Screensaver.java b/src/com/rampey/materialtv/Screensaver.java
+index 3ac85f1..01a6ad4 100644
+--- a/src/com/rampey/materialtv/Screensaver.java
++++ b/src/com/rampey/materialtv/Screensaver.java
+@@ -1,218 +1,29 @@
+ package com.rampey.materialtv;
+ 
+-import android.animation.ValueAnimator;
+-import android.content.ComponentName;
+-import android.graphics.Typeface;
+-import android.graphics.drawable.GradientDrawable;
+-import android.media.MediaMetadata;
+-import android.media.session.MediaController;
+-import android.media.session.MediaSessionManager;
+-import android.media.session.PlaybackState;
+-import android.os.Handler;
+-import android.os.Looper;
+-import android.os.SystemClock;
+ import android.service.dreams.DreamService;
+-import android.util.TypedValue;
+-import android.view.Gravity;
+-import android.view.View;
+-import android.view.ViewGroup;
+-import android.view.animation.PathInterpolator;
+-import android.widget.FrameLayout;
+-import android.widget.ImageView;
+-import android.widget.LinearLayout;
+-import android.widget.TextView;
+-
+-import java.text.SimpleDateFormat;
+-import java.util.Date;
+-import java.util.Locale;
+-
+ 
+ /**
+- * The launcher's screensaver: a large clock and date over generated Material You-style wallpapers (ShapeScene).
+- * Every hour a new palette and arrangement crossfades in. Shows the song if music plays.
+- * The clock block moves a little every minute so nothing sits still on the panel for hours.
++ * The launcher's screensaver: clock, date, the drifting shape, colors that glide between Material palettes.
++ * The drawing and timing live in ScreensaverContent so the quick-settings preview can use the same view.
+  */
+ public class Screensaver extends DreamService {
+-    private static final long FRAME_MS = 0;           // every display frame: 60 fps on a 60 Hz TV (owner choice)
+-    private static final long PALETTE_EVERY = 60 * 60_000L;   // a new wallpaper every hour (owner choice)
+-
+-    private final Handler handler = new Handler(Looper.getMainLooper());
+-    private FrameLayout root;
+-    private ShapeScene scene;
+-    private LinearLayout block;
+-    private TextView clock, date, song;
+-    private double hue;
+-    private long seed;
+-    private long last;
+-    private boolean running;
+-    private int minuteShift;
+-
+-    private final Runnable drift = new Runnable() {
+-        @Override public void run() {
+-            if (!running) return;
+-            long now = SystemClock.uptimeMillis();
+-            if (last == 0 || now - last >= FRAME_MS) {
+-                scene.invalidate();
+-                last = now;
+-            }
+-            root.postOnAnimation(this);
+-        }
+-    };
+-
+-    private final Runnable tick = new Runnable() {
+-        @Override public void run() {
+-            Date d = new Date();
+-            clock.setText(new SimpleDateFormat("h:mm", Locale.getDefault()).format(d));
+-            date.setText(new SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(d));
+-            updateSong();
+-            // Move the clock block slightly each minute (no fixed pixels on the panel for hours).
+-            int m = (int) (System.currentTimeMillis() / 60_000L);
+-            if (m != minuteShift) {
+-                minuteShift = m;
+-                float dx = dp(((m * 37) % 61) - 30), dy = dp(((m * 53) % 41) - 20);
+-                block.animate().translationX(dx).translationY(dy).setDuration(2400)
+-                        .setInterpolator(new PathInterpolator(0.2f, 0f, 0f, 1f)).start();
+-            }
+-            handler.postDelayed(this, 1000 - (System.currentTimeMillis() % 1000) + 5);
+-        }
+-    };
+-
+-    private final Runnable shift = new Runnable() {
+-        @Override public void run() {
+-            seed = seed * 6364136223846793005L + 1442695040888963407L;
+-            ShapeScene next = sceneForNow();
+-            next.setAlpha(0f);
+-            ShapeScene old = scene;
+-            root.addView(next, root.indexOfChild(old) + 1,
+-                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+-            scene = next;
+-            next.animate().alpha(1f).setDuration(2400).setInterpolator(new PathInterpolator(0.2f, 0f, 0f, 1f))
+-                    .withEndAction(() -> root.removeView(old)).start();
+-            recolorText(next);
+-            handler.postDelayed(this, PALETTE_EVERY);
+-        }
+-    };
++    private ScreensaverContent content;
+ 
+     @Override public void onAttachedToWindow() {
+         super.onAttachedToWindow();
+         setInteractive(false);
+         setFullscreen(true);
+-        hue = (System.currentTimeMillis() / 1000L) % 360;
+-        seed = System.currentTimeMillis();
+-        setContentView(build());
++        content = new ScreensaverContent(this);
++        setContentView(content.view());
+     }
+ 
+     @Override public void onDreamingStarted() {
+         super.onDreamingStarted();
+-        running = true;
+-        last = 0;
+-        root.postOnAnimation(drift);
+-        handler.post(tick);
+-        handler.postDelayed(shift, PALETTE_EVERY);
++        if (content != null) content.start();
+     }
+ 
+     @Override public void onDreamingStopped() {
+-        running = false;
+-        handler.removeCallbacksAndMessages(null);
+-        root.removeCallbacks(drift);
++        if (content != null) content.stop();
+         super.onDreamingStopped();
+     }
+-
+-    private View build() {
+-        root = new FrameLayout(this);
+-        root.setBackgroundColor(0xFF000000);
+-        root.addView(new View(this));   // index 0 placeholder so scenes always sit under the clock
+-        scene = sceneForNow();
+-        root.addView(scene, 1, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+-
+-        block = new LinearLayout(this);
+-        block.setOrientation(LinearLayout.VERTICAL);
+-        clock = text(160, scene.onColor, "'wght' 300, 'opsz' 48, 'ROND' 0");
+-        clock.setIncludeFontPadding(false);
+-        clock.setLetterSpacing(-0.01f);
+-        date = text(30, scene.mutedColor, "'wght' 560, 'opsz' 24, 'ROND' 0");
+-        date.setPadding(dp(6), dp(4), 0, 0);
+-        song = text(22, scene.accentColor, "'wght' 560, 'opsz' 24, 'ROND' 0");
+-        song.setPadding(dp(6), dp(18), 0, 0);
+-        song.setSingleLine(true);
+-        song.setMaxWidth(dp(560));
+-        song.setEllipsize(android.text.TextUtils.TruncateAt.END);
+-        block.addView(clock);
+-        block.addView(date);
+-        block.addView(song);
+-        FrameLayout.LayoutParams bl = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.START | Gravity.BOTTOM);
+-        bl.setMargins(dp(96), 0, 0, dp(84));
+-        root.addView(block, bl);
+-        return root;
+-    }
+-
+-    // Time of day -> hue and brightness. Keyframes: hour, hue (degrees), light (0 night .. 1 midday).
+-    private static final double[][] SKY = {
+-            {0, 265, 0.0}, {5, 250, 0.05}, {7, 35, 0.45}, {10, 75, 0.8}, {13, 205, 1.0},
+-            {16, 190, 0.85}, {18, 25, 0.6}, {19.5, 340, 0.35}, {21, 285, 0.1}, {24, 265, 0.0}};
+-
+-    /** A new wallpaper for the current time of day, with a little randomness in hue. */
+-    private ShapeScene sceneForNow() {
+-        java.util.Calendar cal = java.util.Calendar.getInstance();
+-        double h = cal.get(java.util.Calendar.HOUR_OF_DAY) + cal.get(java.util.Calendar.MINUTE) / 60.0;
+-        int i = 0;
+-        while (i < SKY.length - 2 && h >= SKY[i + 1][0]) i++;
+-        double t = (h - SKY[i][0]) / (SKY[i + 1][0] - SKY[i][0]);
+-        double from = SKY[i][1], to = SKY[i + 1][1];
+-        double d = ((to - from + 540) % 360) - 180;            // shortest way around the color wheel
+-        double jitter = ((seed >>> 33) % 25) - 12;              // +-12 degrees so days differ
+-        hue = (from + d * t + jitter + 360) % 360;
+-        float light = (float) (SKY[i][2] + (SKY[i + 1][2] - SKY[i][2]) * t);
+-        return new ShapeScene(this, hue, light, seed);
+-    }
+-
+-    /** Glide the clock's colors to the new wallpaper's palette. */
+-    private void recolorText(ShapeScene next) {
+-        int c0 = clock.getCurrentTextColor(), d0 = date.getCurrentTextColor(), s0 = song.getCurrentTextColor();
+-        android.animation.ArgbEvaluator argb = new android.animation.ArgbEvaluator();
+-        ValueAnimator a = ValueAnimator.ofFloat(0f, 1f).setDuration(2400);
+-        a.addUpdateListener(an -> {
+-            float t = (float) an.getAnimatedValue();
+-            clock.setTextColor((int) argb.evaluate(t, c0, next.onColor));
+-            date.setTextColor((int) argb.evaluate(t, d0, next.mutedColor));
+-            song.setTextColor((int) argb.evaluate(t, s0, next.accentColor));
+-        });
+-        a.start();
+-    }
+-
+-    /** "♪ Title · Artist" while music plays (needs the Now Playing listener the launcher already uses). */
+-    private void updateSong() {
+-        String line = "";
+-        try {
+-            MediaSessionManager m = getSystemService(MediaSessionManager.class);
+-            for (MediaController c : m.getActiveSessions(new ComponentName(this, MediaListener.class))) {
+-                PlaybackState st = c.getPlaybackState();
+-                MediaMetadata md = c.getMetadata();
+-                if (st == null || md == null || st.getState() != PlaybackState.STATE_PLAYING) continue;
+-                CharSequence title = md.getText(MediaMetadata.METADATA_KEY_TITLE);
+-                CharSequence artist = md.getText(MediaMetadata.METADATA_KEY_ARTIST);
+-                if (title == null) continue;
+-                line = "♪  " + title + (artist != null ? "  ·  " + artist : "");
+-                break;
+-            }
+-        } catch (SecurityException ignored) {
+-        }
+-        song.setText(line);
+-        song.setVisibility(line.isEmpty() ? View.GONE : View.VISIBLE);
+-    }
+-
+-    private TextView text(float sp, int color, String axes) {
+-        TextView t = new TextView(this);
+-        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
+-        t.setTextColor(color);
+-        try {
+-            t.setTypeface(new Typeface.Builder(getAssets(), "fonts/GoogleSansFlex.ttf").setFontVariationSettings(axes).build());
+-        } catch (RuntimeException ignored) {
+-        }
+-        return t;
+-    }
+-
+-    private int dp(float v) {
+-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics()));
+-    }
+ }
+diff --git a/src/com/rampey/materialtv/ScreensaverActivity.java b/src/com/rampey/materialtv/ScreensaverActivity.java
+new file mode 100644
+index 0000000..66b86d8
+--- /dev/null
++++ b/src/com/rampey/materialtv/ScreensaverActivity.java
+@@ -0,0 +1,51 @@
++package com.rampey.materialtv;
++
++import android.app.Activity;
++import android.os.Bundle;
++import android.view.KeyEvent;
++import android.view.MotionEvent;
++import android.view.View;
++import android.view.WindowManager;
++
++/**
++ * Full-screen preview of the launcher's screensaver, opened from quick settings. Any remote key returns to Home.
++ * The real DreamService still runs on idle/sleep; this gives the Screensaver tile an immediate, visible action.
++ */
++public class ScreensaverActivity extends Activity {
++    private ScreensaverContent content;
++
++    @Override protected void onCreate(Bundle state) {
++        super.onCreate(state);
++        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
++                | WindowManager.LayoutParams.FLAG_FULLSCREEN);
++        getWindow().getDecorView().setSystemUiVisibility(
++                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
++                        | View.SYSTEM_UI_FLAG_FULLSCREEN
++                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
++                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
++                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
++                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
++        content = new ScreensaverContent(this);
++        setContentView(content.view());
++    }
++
++    @Override protected void onResume() {
++        super.onResume();
++        if (content != null) content.start();
++    }
++
++    @Override protected void onPause() {
++        if (content != null) content.stop();
++        super.onPause();
++    }
++
++    @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
++        finish();
++        return true;
++    }
++
++    @Override public boolean dispatchTouchEvent(MotionEvent event) {
++        finish();
++        return true;
++    }
++}
+diff --git a/src/com/rampey/materialtv/ScreensaverContent.java b/src/com/rampey/materialtv/ScreensaverContent.java
+new file mode 100644
+index 0000000..537ad5c
+--- /dev/null
++++ b/src/com/rampey/materialtv/ScreensaverContent.java
+@@ -0,0 +1,247 @@
++package com.rampey.materialtv;
++
++import android.animation.ArgbEvaluator;
++import android.animation.ValueAnimator;
++import android.content.ComponentName;
++import android.content.Context;
++import android.graphics.drawable.GradientDrawable;
++import android.graphics.Typeface;
++import android.media.MediaMetadata;
++import android.media.session.MediaController;
++import android.media.session.MediaSessionManager;
++import android.media.session.PlaybackState;
++import android.os.Handler;
++import android.os.Looper;
++import android.os.SystemClock;
++import android.text.TextUtils;
++import android.util.TypedValue;
++import android.view.Gravity;
++import android.view.View;
++import android.view.ViewGroup;
++import android.view.animation.PathInterpolator;
++import android.widget.FrameLayout;
++import android.widget.LinearLayout;
++import android.widget.TextView;
++
++import java.util.Date;
++
++/**
++ * The launcher's clock screensaver, shared by the DreamService and the quick-settings preview activity.
++ * Three styles: generated Material You wallpapers (ShapeScene) under the clock, a clean clock on a tonal
++ * gradient, or a dark clock for bedrooms. Every hour a new palette and arrangement crossfades in. Shows the song
++ * if music plays. The clock block moves a little every minute.
++ */
++final class ScreensaverContent {
++    private static final long FRAME_MS = 0;           // every display frame: 60 fps on a 60 Hz TV (owner choice)
++    private static final long PALETTE_EVERY = 60 * 60_000L;   // a new wallpaper every hour (owner choice)
++
++    private final Context context;
++    private final Handler handler = new Handler(Looper.getMainLooper());
++    private final FrameLayout root;
++    private final int style;
++    private ShapeScene scene;
++    private View background;
++    private LinearLayout block;
++    private TextView clock, date, song;
++    private int onColor, mutedColor, accentColor;
++    private double hue;
++    private long seed;
++    private long last;
++    private boolean running;
++    private int minuteShift;
++
++    private final Runnable drift = new Runnable() {
++        @Override public void run() {
++            if (!running) return;
++            long now = SystemClock.uptimeMillis();
++            if (last == 0 || now - last >= FRAME_MS) {
++                if (scene != null) scene.invalidate();
++                last = now;
++            }
++            root.postOnAnimation(this);
++        }
++    };
++
++    private final Runnable tick = new Runnable() {
++        @Override public void run() {
++            Date d = new Date();
++            clock.setText(Dates.time(d));
++            date.setText(Dates.date(d));
++            updateSong();
++            // Move the clock block slightly each minute (no fixed pixels on the panel for hours).
++            int m = (int) (System.currentTimeMillis() / 60_000L);
++            if (m != minuteShift) {
++                minuteShift = m;
++                float dx = dp(((m * 37) % 61) - 30), dy = dp(((m * 53) % 41) - 20);
++                block.animate().translationX(dx).translationY(dy).setDuration(2400)
++                        .setInterpolator(new PathInterpolator(0.2f, 0f, 0f, 1f)).start();
++            }
++            handler.postDelayed(this, 1000 - (System.currentTimeMillis() % 1000) + 5);
++        }
++    };
++
++    private final Runnable shift = new Runnable() {
++        @Override public void run() {
++            if (style != 0 || scene == null) return;
++            seed = seed * 6364136223846793005L + 1442695040888963407L;
++            ShapeScene next = sceneForNow();
++            next.setAlpha(0f);
++            ShapeScene old = scene;
++            root.addView(next, root.indexOfChild(old) + 1,
++                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
++            scene = next;
++            next.animate().alpha(1f).setDuration(2400).setInterpolator(new PathInterpolator(0.2f, 0f, 0f, 1f))
++                    .withEndAction(() -> root.removeView(old)).start();
++            recolorText(next);
++            handler.postDelayed(this, PALETTE_EVERY);
++        }
++    };
++
++    ScreensaverContent(Context context) {
++        this.context = context;
++        this.style = LauncherPrefs.screensaverStyle(context);
++        seed = System.currentTimeMillis();
++        hue = (seed / 1000L) % 360;
++        root = new FrameLayout(context);
++        build();
++    }
++
++    View view() {
++        return root;
++    }
++
++    void start() {
++        if (running) return;
++        running = true;
++        last = 0;
++        root.postOnAnimation(drift);
++        handler.post(tick);
++        if (style == 0) handler.postDelayed(shift, PALETTE_EVERY);
++    }
++
++    void stop() {
++        if (!running) return;
++        running = false;
++        handler.removeCallbacksAndMessages(null);
++        root.removeCallbacks(drift);
++    }
++
++    private void build() {
++        root.setBackgroundColor(0xFF000000);
++        background = new View(context);
++        root.addView(background, new FrameLayout.LayoutParams(
++                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
++
++        if (style == 0) {
++            // Index 0 is the background; scenes always sit under the clock, and a new scene fades in above the old.
++            scene = sceneForNow();
++            root.addView(scene, 1, new FrameLayout.LayoutParams(
++                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
++            onColor = scene.onColor;
++            mutedColor = scene.mutedColor;
++            accentColor = scene.accentColor;
++        } else {
++            Palette base = Palette.of(LauncherPrefs.accentSeed(context));
++            GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
++                    style == 1 ? new int[]{base.surfaceBright, base.surface}
++                            : new int[]{0xFF101014, 0xFF000000});
++            background.setBackground(bg);
++            onColor = style == 1 ? base.onSurface : 0xFFD6D2DC;
++            mutedColor = style == 1 ? base.onSurfaceVariant : 0xFF8D8795;
++            accentColor = style == 1 ? base.primary : 0xFFB9A8D6;
++        }
++
++        block = new LinearLayout(context);
++        block.setOrientation(LinearLayout.VERTICAL);
++        clock = text(160, onColor, "'wght' 300, 'opsz' 48, 'ROND' 0");
++        clock.setIncludeFontPadding(false);
++        clock.setLetterSpacing(-0.01f);
++        if (style == 2) clock.setAlpha(0.86f);
++        date = text(30, mutedColor, "'wght' 560, 'opsz' 24, 'ROND' 0");
++        date.setPadding(dp(6), dp(4), 0, 0);
++        song = text(22, accentColor, "'wght' 560, 'opsz' 24, 'ROND' 0");
++        song.setPadding(dp(6), dp(18), 0, 0);
++        song.setSingleLine(true);
++        song.setMaxWidth(dp(560));
++        song.setEllipsize(TextUtils.TruncateAt.END);
++        block.addView(clock);
++        block.addView(date);
++        block.addView(song);
++        FrameLayout.LayoutParams bl = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.START | Gravity.BOTTOM);
++        bl.setMargins(dp(96), 0, 0, dp(84));
++        root.addView(block, bl);
++    }
++
++    // Time of day -> hue and brightness. Keyframes: hour, hue (degrees), light (0 night .. 1 midday).
++    private static final double[][] SKY = {
++            {0, 265, 0.0}, {5, 250, 0.05}, {7, 35, 0.45}, {10, 75, 0.8}, {13, 205, 1.0},
++            {16, 190, 0.85}, {18, 25, 0.6}, {19.5, 340, 0.35}, {21, 285, 0.1}, {24, 265, 0.0}};
++
++    /** A new wallpaper for the current time of day, with a little randomness in hue. */
++    private ShapeScene sceneForNow() {
++        java.util.Calendar cal = java.util.Calendar.getInstance();
++        double h = cal.get(java.util.Calendar.HOUR_OF_DAY) + cal.get(java.util.Calendar.MINUTE) / 60.0;
++        int i = 0;
++        while (i < SKY.length - 2 && h >= SKY[i + 1][0]) i++;
++        double t = (h - SKY[i][0]) / (SKY[i + 1][0] - SKY[i][0]);
++        double from = SKY[i][1], to = SKY[i + 1][1];
++        double d = ((to - from + 540) % 360) - 180;            // shortest way around the color wheel
++        double jitter = ((seed >>> 33) % 25) - 12;              // +-12 degrees so days differ
++        hue = (from + d * t + jitter + 360) % 360;
++        float light = (float) (SKY[i][2] + (SKY[i + 1][2] - SKY[i][2]) * t);
++        return new ShapeScene(context, hue, light, seed);
++    }
++
++    /** Glide the clock's colors to the new wallpaper's palette. */
++    private void recolorText(ShapeScene next) {
++        int c0 = clock.getCurrentTextColor(), d0 = date.getCurrentTextColor(), s0 = song.getCurrentTextColor();
++        ArgbEvaluator argb = new ArgbEvaluator();
++        ValueAnimator a = ValueAnimator.ofFloat(0f, 1f).setDuration(2400);
++        a.addUpdateListener(an -> {
++            float t = (float) an.getAnimatedValue();
++            clock.setTextColor((int) argb.evaluate(t, c0, next.onColor));
++            date.setTextColor((int) argb.evaluate(t, d0, next.mutedColor));
++            song.setTextColor((int) argb.evaluate(t, s0, next.accentColor));
++        });
++        a.start();
++        onColor = next.onColor;
++        mutedColor = next.mutedColor;
++        accentColor = next.accentColor;
++    }
++
++    /** "♪ Title · Artist" while music plays (needs the Now Playing listener the launcher already uses). */
++    private void updateSong() {
++        String line = "";
++        try {
++            MediaSessionManager m = context.getSystemService(MediaSessionManager.class);
++            for (MediaController c : m.getActiveSessions(new ComponentName(context, MediaListener.class))) {
++                PlaybackState st = c.getPlaybackState();
++                MediaMetadata md = c.getMetadata();
++                if (st == null || md == null || st.getState() != PlaybackState.STATE_PLAYING) continue;
++                CharSequence title = md.getText(MediaMetadata.METADATA_KEY_TITLE);
++                CharSequence artist = md.getText(MediaMetadata.METADATA_KEY_ARTIST);
++                if (title == null) continue;
++                line = "♪  " + title + (artist != null ? "  ·  " + artist : "");
++                break;
++            }
++        } catch (SecurityException ignored) {
++        }
++        song.setText(line);
++        song.setVisibility(line.isEmpty() ? View.GONE : View.VISIBLE);
++    }
++
++    private TextView text(float sp, int color, String axes) {
++        TextView t = new TextView(context);
++        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
++        t.setTextColor(color);
++        try {
++            t.setTypeface(new Typeface.Builder(context.getAssets(), "fonts/GoogleSansFlex.ttf").setFontVariationSettings(axes).build());
++        } catch (RuntimeException ignored) {
++        }
++        return t;
++    }
++
++    private int dp(float v) {
++        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, context.getResources().getDisplayMetrics()));
++    }
++}
+diff --git a/src/com/rampey/materialtv/VoiceAgent.java b/src/com/rampey/materialtv/VoiceAgent.java
+index d8c16c5..0c95201 100644
+--- a/src/com/rampey/materialtv/VoiceAgent.java
++++ b/src/com/rampey/materialtv/VoiceAgent.java
+@@ -96,7 +96,7 @@ final class VoiceAgent {
+             c.setDoOutput(true);
+             c.setRequestProperty("Content-Type", "application/json");
+             c.setRequestProperty("Authorization", "Bearer " + key);
+-            c.setRequestProperty("X-Title", "Material TV Launcher voice");
++            c.setRequestProperty("X-Title", "ianvex tv launcher voice");
+             try (OutputStream out = c.getOutputStream()) {
+                 out.write(body.toString().getBytes(StandardCharsets.UTF_8));
+             }
+@@ -149,7 +149,7 @@ final class VoiceAgent {
+             c.setDoOutput(true);
+             c.setRequestProperty("Content-Type", "application/json");
+             c.setRequestProperty("Authorization", "Bearer " + key);
+-            c.setRequestProperty("X-Title", "Material TV Launcher voice");
++            c.setRequestProperty("X-Title", "ianvex tv launcher voice");
+             try (OutputStream out = c.getOutputStream()) {
+                 out.write(body.toString().getBytes(StandardCharsets.UTF_8));
+             }

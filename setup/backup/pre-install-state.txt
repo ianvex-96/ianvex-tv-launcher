@@ -1,0 +1,15 @@
+== enabled_accessibility_services
+com.gathin.tvhome/com.gathin.tvhome.HomeKeyService
+== enabled_notification_listeners
+com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.coreservices.notificationlistener.TvNotificationListenerService:com.gathin.tvhome/com.gathin.tvhome.NowPlayingListener
+== accessibility_enabled
+1
+== screensaver_components
+com.google.android.apps.tv.dreamx/.service.Backdrop
+== home_resolve
+  name=com.google.android.apps.tv.launcherx.home.HomeActivity
+  packageName=com.google.android.apps.tv.launcherx
+    name=com.google.android.apps.tv.launcherx.LauncherX_Application
+    packageName=com.google.android.apps.tv.launcherx
+== free_storage
+/dev/block/dm-46 4.0G 2.2G  1.6G  58% /data/user/0

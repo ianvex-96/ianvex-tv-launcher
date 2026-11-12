@@ -1,0 +1,11 @@
+== before wifi build ==
+-- accessibility
+com.rampey.materialtv/com.rampey.materialtv.HomeKeyService
+-- notification
+com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.coreservices.notificationlistener.TvNotificationListenerService:com.rampey.materialtv/com.rampey.materialtv.MediaListener:com.gathin.tvhome/com.gathin.tvhome.NowPlayingListener
+-- screensaver
+com.rampey.materialtv/com.rampey.materialtv.Screensaver
+-- home role
+com.rampey.materialtv
+-- usage
+GET_USAGE_STATS: allow; time=+18m16s247ms ago; rejectTime=+8h8m23s968ms ago
