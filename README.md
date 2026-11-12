@@ -89,7 +89,7 @@ untuk tombol Home, lalu membuka launcher. Untuk mengembalikan TV seperti semula:
 bash setup/uninstall.sh 192.168.7.102
 ```
 
-APK siap pasang ada di [`setup/material-tv-launcher-wifi.apk`](setup/material-tv-launcher-wifi.apk)
+APK siap pasang ada di [`setup/ianvex-tv-launcher.apk`](setup/ianvex-tv-launcher.apk)
 (build 230, versionName 0.1.7). Detail perubahan dan izin ada di
 [`setup/CUSTOMIZATIONS.md`](setup/CUSTOMIZATIONS.md).
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install the launcher on an Android TV over ADB and grant what it needs.
-#   ./install.sh <tv-ip> [path/to/material-tv-launcher.apk]
-# Uses material-tv-launcher-wifi.apk next to this script (the custom build), then the official release.
+#   ./install.sh <tv-ip> [path/to/ianvex-tv-launcher.apk]
+# Uses ianvex-tv-launcher.apk next to this script (the custom build), then the official release.
 # Before: on the TV, turn on Developer options > USB debugging (and Network debugging if listed), then accept the
 # "Allow USB debugging?" prompt the first time this connects.
 set -euo pipefail
@@ -9,11 +9,11 @@ IP="${1:?usage: ./install.sh <tv-ip> [apk]}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 APK="${2:-}"
 if [[ -z "$APK" ]]; then
-  for c in "$HERE/material-tv-launcher-wifi.apk" "$HERE/material-tv-launcher.apk" "$HERE/build/material-tv-launcher.apk"; do
+  for c in "$HERE/ianvex-tv-launcher.apk" "$HERE/material-tv-launcher.apk" "$HERE/build/material-tv-launcher.apk"; do
     [[ -f "$c" ]] && { APK="$c"; break; }
   done
 fi
-[[ -n "$APK" && -f "$APK" ]] || { echo "No APK found. Put material-tv-launcher-wifi.apk next to install.sh, or pass its path." >&2; exit 1; }
+[[ -n "$APK" && -f "$APK" ]] || { echo "No APK found. Put ianvex-tv-launcher.apk next to install.sh, or pass its path." >&2; exit 1; }
 PKG=com.rampey.materialtv
 T="$IP:5555"
 S() { adb -s "$T" shell "$@" | tr -d '\r'; }

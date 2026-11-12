@@ -97,7 +97,7 @@ adb shell settings put secure accessibility_enabled 1
 
 ## Files
 
-- `material-tv-launcher-wifi.apk` — current custom build (debug-signed).
+- `ianvex-tv-launcher.apk` — current custom build (debug-signed).
 - `wifi-tab.patch` — full source diff (Wi-Fi tab, Indonesian date, greeting, quick settings,
   screen-off and launcher settings, dock picker with search/reorder, tile menu, screensaver
   styles, Now Playing skip buttons, icons).
