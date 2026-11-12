@@ -8,6 +8,10 @@ Fork dari [0xRampey/material-tv-launcher](https://github.com/0xRampey/material-t
 dikustomisasi untuk TV ianvex. Tanpa iklan, tanpa rekomendasi, dengan warna dinamis
 Material You dan dukungan voice Gemini opsional (membawa API key OpenRouter sendiri).
 
+[![Facebook](https://img.shields.io/badge/Facebook-ianvex.id-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/ianvex.id)
+[![GitHub](https://img.shields.io/badge/GitHub-ianvex--96-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ianvex-96)
+[![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ianvex-96/ianvex-tv-launcher/releases/latest/download/ianvex-tv-launcher.apk)
+
 </div>
 
 ![ianvex tv launcher: Home dengan sapaan Indonesia, Now Playing, dan dock aplikasi](setup/screenshots/home.png)
@@ -132,6 +136,20 @@ Diuji pada TV Android 14 (SDK 34), resolusi 1280×720, arsitektur `armeabi-v7a`:
 - Quick settings baru terbuka dan seluruh 9 tile, slider, dan footer terlihat.
 - Halaman Launcher settings menampilkan `ianvex tv launcher 0.1.7`.
 - Home button dan screensaver tetap berfungsi.
+
+## Sosial media
+
+Ikuti update launcher, screenshot baru, dan info rilis di Facebook:
+
+[![Facebook ianvex.id](https://img.shields.io/badge/Facebook-www.facebook.com%2Fianvex.id-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/ianvex.id)
+
+| Platform | Akun |
+|---|---|
+| Facebook | [www.facebook.com/ianvex.id](https://www.facebook.com/ianvex.id) |
+| GitHub | [github.com/ianvex-96](https://github.com/ianvex-96) |
+| Repo ini | [ianvex-96/ianvex-tv-launcher](https://github.com/ianvex-96/ianvex-tv-launcher) |
+
+Kalau launcher ini berguna, jangan lupa kasih ⭐ di repo dan bagikan ke temanmu.
 
 ## Kredit & lisensi
 
