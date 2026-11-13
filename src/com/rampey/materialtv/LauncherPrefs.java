@@ -20,6 +20,7 @@ final class LauncherPrefs {
     private static final String SCREENSAVER_STYLE = "screensaver_style";
     private static final String HIDDEN_APPS = "hidden_apps";
     private static final String SCREEN_OFF_RESTORE = "screen_off_restore";
+    private static final String LANGUAGE = "language";
 
     static final String DEFAULT_GREETING_NAME = "Nafil Julio Firmansyah";
 
@@ -57,6 +58,16 @@ final class LauncherPrefs {
 
     static void setGreetingOn(Context context, boolean on) {
         prefs(context).edit().putBoolean(GREETING_ON, on).apply();
+    }
+
+    /** 0 = Indonesian, 1 = English, 2 = follow the TV language. */
+    static int language(Context context) {
+        return prefs(context).getInt(LANGUAGE, L.INDONESIAN);
+    }
+
+    static void setLanguage(Context context, int language) {
+        prefs(context).edit().putInt(LANGUAGE,
+                Math.max(L.INDONESIAN, Math.min(L.SYSTEM, language))).apply();
     }
 
     static int accentSeed(Context context) {

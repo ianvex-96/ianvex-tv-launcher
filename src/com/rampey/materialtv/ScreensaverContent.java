@@ -66,7 +66,7 @@ final class ScreensaverContent {
         @Override public void run() {
             Date d = new Date();
             clock.setText(Dates.time(d));
-            date.setText(Dates.date(d));
+            date.setText(Dates.date(d, L.english(context)));
             updateSong();
             // Move the clock block slightly each minute (no fixed pixels on the panel for hours).
             int m = (int) (System.currentTimeMillis() / 60_000L);

@@ -98,13 +98,16 @@ public class DockAppsActivity extends Activity {
         title.setIncludeFontPadding(false);
         column.addView(title, match());
 
-        TextView hint = text("Pilih maksimal 6 aplikasi. Urutkan dengan tombol kiri/kanan.", 13, palette.onSurfaceVariant, 500);
+        TextView hint = text(L.t(this,
+                        "Pilih maksimal 6 aplikasi. Urutkan dengan tombol kiri/kanan.",
+                        "Pick up to 6 apps. Reorder with the left/right buttons."),
+                13, palette.onSurfaceVariant, 500);
         hint.setPadding(0, dp(3), 0, dp(8));
         column.addView(hint, match());
 
         search = new EditText(this);
         search.setSingleLine(true);
-        search.setHint("Cari aplikasi");
+        search.setHint(L.t(this, "Cari aplikasi", "Search apps"));
         search.setHintTextColor(withAlpha(palette.onSurfaceVariant, 0xAA));
         search.setTextColor(palette.onSurface);
         search.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
@@ -170,16 +173,17 @@ public class DockAppsActivity extends Activity {
         footer.setOrientation(LinearLayout.HORIZONTAL);
         footer.setGravity(Gravity.CENTER_VERTICAL);
         footer.setPadding(0, dp(10), 0, 0);
-        TextView automatic = footerButton("Otomatis", false);
+        TextView automatic = footerButton(L.t(this, "Otomatis", "Automatic"), false);
         automatic.setOnClickListener(v -> {
             LauncherPrefs.clearDockApps(this);
-            Toast.makeText(this, "Dock memakai urutan otomatis", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, L.t(this, "Dock memakai urutan otomatis", "Dock uses automatic order"),
+                    Toast.LENGTH_SHORT).show();
             finish();
         });
-        saveButton = footerButton("Simpan", true);
+        saveButton = footerButton(L.t(this, "Simpan", "Save"), true);
         saveButton.setOnClickListener(v -> {
             LauncherPrefs.setDockApps(this, selected);
-            Toast.makeText(this, "Dock disimpan", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, L.t(this, "Dock disimpan", "Dock saved"), Toast.LENGTH_SHORT).show();
             finish();
         });
         footer.addView(automatic, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -252,7 +256,8 @@ public class DockAppsActivity extends Activity {
             selected.remove(row.pkg);
         } else {
             if (selected.size() >= MAX_APPS) {
-                Toast.makeText(this, "Maksimal 6 aplikasi", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, L.t(this, "Maksimal 6 aplikasi", "Up to 6 apps"),
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
             selected.add(row.pkg);
@@ -266,12 +271,12 @@ public class DockAppsActivity extends Activity {
         chips.removeAllViews();
         chipViews.clear();
         if (selected.isEmpty()) {
-            chipHint.setText("Belum ada aplikasi dipilih.");
+            chipHint.setText(L.t(this, "Belum ada aplikasi dipilih.", "No apps selected yet."));
             chipScroller.setVisibility(View.GONE);
             return;
         }
         chipScroller.setVisibility(View.VISIBLE);
-        chipHint.setText("Urutan dock (◀ ▶ untuk menggeser)");
+        chipHint.setText(L.t(this, "Urutan dock (◀ ▶ untuk menggeser)", "Dock order (◀ ▶ to move)"));
         for (int i = 0; i < selected.size(); i++) {
             final int index = i;
             String pkg = selected.get(i);
@@ -371,7 +376,8 @@ public class DockAppsActivity extends Activity {
     }
 
     private void updateCount() {
-        if (count != null) count.setText(selected.size() + " dari " + MAX_APPS + " dipilih");
+        if (count != null) count.setText(selected.size() + L.t(this, " dari ", " of ")
+                + MAX_APPS + L.t(this, " dipilih", " selected"));
     }
 
     private void paint(Row row) {

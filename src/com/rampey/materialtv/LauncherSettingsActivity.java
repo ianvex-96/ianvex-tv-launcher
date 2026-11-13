@@ -34,9 +34,12 @@ public class LauncherSettingsActivity extends Activity {
     private static final int[] SEEDS = {
             0xFF6750A4, 0xFFB3261E, 0xFF386A20, 0xFF0061A4,
             0xFF8B5000, 0xFF8E4585, 0xFF006A6A, 0xFF6D5E00};
-    private static final String[] SEED_NAMES = {
+    private static final String[] SEED_NAMES_ID = {
             "Ungu", "Merah", "Hijau", "Biru", "Oranye", "Merah muda", "Teal", "Zaitun"};
-    private static final String[] SAVER_NAMES = {"Bentuk + jam", "Jam saja", "Gelap"};
+    private static final String[] SEED_NAMES_EN = {
+            "Purple", "Red", "Green", "Blue", "Orange", "Pink", "Teal", "Olive"};
+    private static final String[] SAVER_NAMES_ID = {"Bentuk + jam", "Jam saja", "Gelap"};
+    private static final String[] SAVER_NAMES_EN = {"Shapes + clock", "Clock only", "Dark"};
 
     private Palette palette;
     private PackageManager pm;
@@ -54,10 +57,13 @@ public class LauncherSettingsActivity extends Activity {
         root.setPadding(dp(48), dp(24), dp(48), dp(18));
         root.setBackgroundColor(palette.surface);
 
-        TextView title = text("Pengaturan launcher", 30, palette.onSurface, 760);
+        TextView title = text(L.t(this, "Pengaturan launcher", "Launcher settings"),
+                30, palette.onSurface, 760);
         title.setIncludeFontPadding(false);
         root.addView(title, match());
-        TextView subtitle = text("Sapaan, warna, screensaver dan aplikasi tersembunyi.", 13,
+        TextView subtitle = text(L.t(this,
+                        "Sapaan, warna, screensaver dan aplikasi tersembunyi.",
+                        "Greeting, color, screensaver and hidden apps."), 13,
                 palette.onSurfaceVariant, 500);
         subtitle.setPadding(0, dp(3), 0, dp(10));
         root.addView(subtitle, match());
@@ -73,13 +79,14 @@ public class LauncherSettingsActivity extends Activity {
         root.addView(scroll, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
 
+        buildLanguage(content);
         buildGreeting(content);
         buildTheme(content);
         buildScreensaver(content);
         buildHidden(content);
         buildAbout(content);
 
-        TextView back = footerButton("Kembali", true);
+        TextView back = footerButton(L.t(this, "Kembali", "Back"), true);
         back.setOnClickListener(v -> finish());
         LinearLayout.LayoutParams backLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -88,15 +95,48 @@ public class LauncherSettingsActivity extends Activity {
         return root;
     }
 
+    // ---- language ----
+
+    private void buildLanguage(LinearLayout parent) {
+        section(parent, L.t(this, "Bahasa", "Language"));
+        TextView hint = text(L.t(this,
+                        "Pilih bahasa tampilan launcher. Bahasa Indonesia tetap menjadi bawaan.",
+                        "Choose the launcher display language. Indonesian stays the default."),
+                12, palette.onSurfaceVariant, 500);
+        hint.setPadding(dp(2), 0, 0, dp(8));
+        parent.addView(hint, match());
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        int current = LauncherPrefs.language(this);
+        String[] labels = {
+                L.t(this, "Ikuti sistem", "Follow system"),
+                "Indonesia",
+                "English"};
+        int[] values = {L.SYSTEM, L.INDONESIAN, L.ENGLISH};
+        for (int i = 0; i < labels.length; i++) {
+            final int value = values[i];
+            TextView chip = chip(labels[i], value == current, () -> {
+                LauncherPrefs.setLanguage(this, value);
+                recreate();
+            });
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            if (i > 0) lp.setMarginStart(dp(8));
+            row.addView(chip, lp);
+        }
+        parent.addView(row, match());
+    }
+
     // ---- greeting ----
 
     private void buildGreeting(LinearLayout parent) {
-        section(parent, "Sapaan");
+        section(parent, L.t(this, "Sapaan", "Greeting"));
 
         EditText name = new EditText(this);
         name.setSingleLine(true);
         name.setText(LauncherPrefs.greetingName(this));
-        name.setHint("Nama sapaan");
+        name.setHint(L.t(this, "Nama sapaan", "Greeting name"));
         name.setHintTextColor(withAlpha(palette.onSurfaceVariant, 0xAA));
         name.setTextColor(palette.onSurface);
         name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -122,13 +162,14 @@ public class LauncherSettingsActivity extends Activity {
         parent.addView(name, nameLp);
 
         boolean on = LauncherPrefs.greetingOn(this);
-        View toggle = toggleRow("Tampilkan sapaan", on ? "Aktif" : "Nonaktif", on, () -> {
+        View toggle = toggleRow(L.t(this, "Tampilkan sapaan", "Show greeting"),
+                on ? L.t(this, "Aktif", "On") : L.t(this, "Nonaktif", "Off"), on, () -> {
             LauncherPrefs.setGreetingOn(this, !LauncherPrefs.greetingOn(this));
             recreate();
         });
         parent.addView(toggle, match());
 
-        TextView reset = chip("Pakai nama bawaan", false, () -> {
+        TextView reset = chip(L.t(this, "Pakai nama bawaan", "Use default name"), false, () -> {
             LauncherPrefs.setGreetingName(this, LauncherPrefs.DEFAULT_GREETING_NAME);
             recreate();
         });
@@ -141,8 +182,10 @@ public class LauncherSettingsActivity extends Activity {
     // ---- theme ----
 
     private void buildTheme(LinearLayout parent) {
-        section(parent, "Warna");
-        TextView hint = text("Pilih warna aksen, atau ikuti warna aplikasi yang sedang disorot.", 12,
+        section(parent, L.t(this, "Warna", "Color"));
+        TextView hint = text(L.t(this,
+                        "Pilih warna aksen, atau ikuti warna aplikasi yang sedang disorot.",
+                        "Pick an accent color, or follow the color of the focused app."), 12,
                 palette.onSurfaceVariant, 500);
         hint.setPadding(dp(2), 0, 0, dp(8));
         parent.addView(hint, match());
@@ -151,6 +194,7 @@ public class LauncherSettingsActivity extends Activity {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         int current = LauncherPrefs.accentSeed(this);
+        String[] seedNames = L.english(this) ? SEED_NAMES_EN : SEED_NAMES_ID;
         for (int i = 0; i < SEEDS.length; i++) {
             final int seed = SEEDS[i];
             boolean selected = seed == current;
@@ -159,7 +203,7 @@ public class LauncherSettingsActivity extends Activity {
             dot.setTextColor(0xFF000000);
             dot.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
             dot.setGravity(Gravity.CENTER);
-            dot.setContentDescription(SEED_NAMES[i]);
+            dot.setContentDescription(seedNames[i]);
             dot.setFocusable(true);
             dot.setFocusableInTouchMode(false);
             dot.setClickable(true);
@@ -178,7 +222,9 @@ public class LauncherSettingsActivity extends Activity {
             dot.setOnClickListener(v -> {
                 LauncherPrefs.setAccentSeed(this, seed);
                 LauncherPrefs.setDynamicColor(this, false);
-                Toast.makeText(this, "Warna " + SEED_NAMES[indexOf(seed)] + " diterapkan", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, L.t(this, "Warna ", "Color ")
+                        + seedNames[indexOf(seed)]
+                        + L.t(this, " diterapkan", " applied"), Toast.LENGTH_SHORT).show();
                 recreate();
             });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(46), dp(46));
@@ -188,7 +234,8 @@ public class LauncherSettingsActivity extends Activity {
         parent.addView(row, match());
 
         boolean dynamic = LauncherPrefs.dynamicColor(this);
-        View toggle = toggleRow("Ikuti warna aplikasi", dynamic ? "Aktif" : "Nonaktif", dynamic, () -> {
+        View toggle = toggleRow(L.t(this, "Ikuti warna aplikasi", "Follow app color"),
+                dynamic ? L.t(this, "Aktif", "On") : L.t(this, "Nonaktif", "Off"), dynamic, () -> {
             LauncherPrefs.setDynamicColor(this, !LauncherPrefs.dynamicColor(this));
             recreate();
         });
@@ -208,12 +255,13 @@ public class LauncherSettingsActivity extends Activity {
     private void buildScreensaver(LinearLayout parent) {
         section(parent, "Screensaver");
         int style = LauncherPrefs.screensaverStyle(this);
+        String[] saverNames = L.english(this) ? SAVER_NAMES_EN : SAVER_NAMES_ID;
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        for (int i = 0; i < SAVER_NAMES.length; i++) {
+        for (int i = 0; i < saverNames.length; i++) {
             final int value = i;
-            TextView chip = chip(SAVER_NAMES[i], i == style, () -> {
+            TextView chip = chip(saverNames[i], i == style, () -> {
                 LauncherPrefs.setScreensaverStyle(this, value);
                 recreate();
             });
@@ -226,13 +274,13 @@ public class LauncherSettingsActivity extends Activity {
         LinearLayout buttons = new LinearLayout(this);
         buttons.setOrientation(LinearLayout.HORIZONTAL);
         buttons.setGravity(Gravity.CENTER_VERTICAL);
-        TextView preview = chip("Pratinjau", false, () -> {
+        TextView preview = chip(L.t(this, "Pratinjau", "Preview"), false, () -> {
             try {
                 startActivity(new Intent(this, ScreensaverActivity.class));
             } catch (RuntimeException ignored) {
             }
         });
-        TextView idle = chip("Waktu tidur layar", false, () -> {
+        TextView idle = chip(L.t(this, "Waktu tidur layar", "Screen timeout"), false, () -> {
             try {
                 startActivity(new Intent(Settings.ACTION_DREAM_SETTINGS));
             } catch (ActivityNotFoundException unavailable) {
@@ -255,10 +303,12 @@ public class LauncherSettingsActivity extends Activity {
     // ---- hidden apps ----
 
     private void buildHidden(LinearLayout parent) {
-        section(parent, "Aplikasi disembunyikan");
+        section(parent, L.t(this, "Aplikasi disembunyikan", "Hidden apps"));
         List<String> hidden = LauncherPrefs.hiddenApps(this);
         if (hidden.isEmpty()) {
-            TextView empty = text("Tidak ada aplikasi disembunyikan. Tahan OK pada ubin untuk menyembunyikan.",
+            TextView empty = text(L.t(this,
+                            "Tidak ada aplikasi disembunyikan. Tahan OK pada ubin untuk menyembunyikan.",
+                            "No hidden apps. Hold OK on a tile to hide it."),
                     12, palette.onSurfaceVariant, 500);
             empty.setPadding(dp(2), 0, 0, dp(2));
             parent.addView(empty, match());
@@ -280,7 +330,7 @@ public class LauncherSettingsActivity extends Activity {
             label.setEllipsize(TextUtils.TruncateAt.END);
             row.addView(label, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
-            TextView show = chip("Tampilkan", false, () -> {
+            TextView show = chip(L.t(this, "Tampilkan", "Show"), false, () -> {
                 LauncherPrefs.showApp(this, pkg);
                 recreate();
             });
@@ -291,7 +341,7 @@ public class LauncherSettingsActivity extends Activity {
             lp.bottomMargin = dp(6);
             parent.addView(row, lp);
         }
-        TextView all = chip("Tampilkan semua", false, () -> {
+        TextView all = chip(L.t(this, "Tampilkan semua", "Show all"), false, () -> {
             LauncherPrefs.clearHiddenApps(this);
             recreate();
         });

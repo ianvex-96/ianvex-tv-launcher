@@ -147,6 +147,7 @@ public class HomeActivity extends Activity {
     private View tileMenuReturnFocus;
     private int appliedAccent;
     private boolean appliedDynamic;
+    private int appliedLanguage;
 
     // Focus settles before the expensive part runs, so holding a direction stays smooth.
     private String pendingPkg;
@@ -325,11 +326,12 @@ public class HomeActivity extends Activity {
             return;
         }
         greeting.setVisibility(View.VISIBLE);
+        boolean english = L.english(this);
         int hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
-        String part = hour >= 4 && hour < 11 ? "Selamat pagi"
-                : hour >= 11 && hour < 15 ? "Selamat siang"
-                : hour >= 15 && hour < 19 ? "Selamat sore"
-                : "Selamat malam";
+        String part = hour >= 4 && hour < 11 ? (english ? "Good morning" : "Selamat pagi")
+                : hour >= 11 && hour < 15 ? (english ? "Good afternoon" : "Selamat siang")
+                : hour >= 15 && hour < 19 ? (english ? "Good evening" : "Selamat sore")
+                : (english ? "Good night" : "Selamat malam");
         String name = LauncherPrefs.greetingName(this);
         greeting.setText(name.isEmpty() ? part : part + ", " + name);
     }
@@ -344,7 +346,7 @@ public class HomeActivity extends Activity {
             } else if (!time.contentEquals(clock.getText())) {
                 changeClock(time);
             }
-            date.setText(Dates.date(now));
+            date.setText(Dates.date(now, L.english(HomeActivity.this)));
             updateGreeting();
             updateWifiLabel();
             handler.postDelayed(this, 15_000);
@@ -356,7 +358,7 @@ public class HomeActivity extends Activity {
             if (quickTime == null || quickDate == null) return;
             Date now = new Date();
             quickTime.setText(Dates.time(now));
-            quickDate.setText(Dates.date(now));
+            quickDate.setText(Dates.date(now, L.english(HomeActivity.this)));
             handler.postDelayed(this, 30_000);
         }
     };
@@ -368,6 +370,7 @@ public class HomeActivity extends Activity {
         pm = getPackageManager();
         appliedAccent = LauncherPrefs.accentSeed(this);
         appliedDynamic = LauncherPrefs.dynamicColor(this);
+        appliedLanguage = LauncherPrefs.language(this);
         palette = Palette.of(appliedAccent);
         setContentView(buildRoot());
     }
@@ -376,9 +379,11 @@ public class HomeActivity extends Activity {
         super.onResume();
         int accent = LauncherPrefs.accentSeed(this);
         boolean dynamic = LauncherPrefs.dynamicColor(this);
-        if (accent != appliedAccent || dynamic != appliedDynamic) {
+        int language = LauncherPrefs.language(this);
+        if (accent != appliedAccent || dynamic != appliedDynamic || language != appliedLanguage) {
             appliedAccent = accent;
             appliedDynamic = dynamic;
+            appliedLanguage = language;
             recreate();
             return;
         }
@@ -1450,7 +1455,8 @@ public class HomeActivity extends Activity {
             Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 1500);
         } catch (RuntimeException denied) {
             LauncherPrefs.clearScreenOffRestore(this);
-            Toast.makeText(this, "Tidak bisa mematikan layar", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, L.t(this, "Tidak bisa mematikan layar", "Can't turn off the screen"),
+                    Toast.LENGTH_SHORT).show();
             return;
         }
         closeQuickSettings();
@@ -1523,7 +1529,7 @@ public class HomeActivity extends Activity {
         quickTime = text(Dates.time(new Date()), 28, palette.onSurface, 760);
         quickTime.setIncludeFontPadding(false);
         headerLeft.addView(quickTime, match());
-        quickDate = text(Dates.date(new Date()), 11, palette.onSurfaceVariant, 500);
+        quickDate = text(Dates.date(new Date(), L.english(this)), 11, palette.onSurfaceVariant, 500);
         quickDate.setIncludeFontPadding(false);
         headerLeft.addView(quickDate, match());
         header.addView(headerLeft, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -1601,16 +1607,21 @@ public class HomeActivity extends Activity {
             showApps();
         });
 
-        QuickTile offTile = new QuickTile(R.drawable.ic_screen_off, "Layar mati", "Matikan tampilan", false);
+        QuickTile offTile = new QuickTile(R.drawable.ic_screen_off,
+                L.t(this, "Layar mati", "Screen off"),
+                L.t(this, "Matikan tampilan", "Turn off display"), false);
         offTile.view.setOnClickListener(v -> turnScreenOff());
 
-        QuickTile launcherTile = new QuickTile(R.drawable.ic_tune, "Launcher", "Sapaan & tema", false);
+        QuickTile launcherTile = new QuickTile(R.drawable.ic_tune, "Launcher",
+                L.t(this, "Sapaan & tema", "Greeting & theme"), false);
         launcherTile.view.setOnClickListener(v -> {
             closeQuickSettings();
             openLauncherSettings();
         });
 
-        QuickTile settingsTile = new QuickTile(R.drawable.ic_settings, "Pengaturan TV", "Semua setelan", false);
+        QuickTile settingsTile = new QuickTile(R.drawable.ic_settings,
+                L.t(this, "Pengaturan TV", "TV settings"),
+                L.t(this, "Semua setelan", "All settings"), false);
         settingsTile.view.setOnClickListener(v -> openSettingsAction(Settings.ACTION_SETTINGS));
 
         // Brightness first, like the Android shade; the volume pill sits just under it.
@@ -1660,7 +1671,7 @@ public class HomeActivity extends Activity {
             closeQuickSettings();
             openDockSettings();
         });
-        TextView closePanel = quickFooterButton("Tutup", 0);
+        TextView closePanel = quickFooterButton(L.t(this, "Tutup", "Close"), 0);
         closePanel.setOnClickListener(v -> closeQuickSettings());
         LinearLayout footer = new LinearLayout(this);
         footer.setOrientation(LinearLayout.HORIZONTAL);
@@ -1771,19 +1782,22 @@ public class HomeActivity extends Activity {
         title.setSingleLine(true);
         title.setEllipsize(TextUtils.TruncateAt.END);
         panel.addView(title, match());
-        TextView sub = text("Tahan OK untuk menu ini", 10, palette.onSurfaceVariant, 500);
+        TextView sub = text(L.t(this, "Tahan OK untuk menu ini", "Hold OK for this menu"),
+                10, palette.onSurfaceVariant, 500);
         sub.setPadding(0, dp(3), 0, dp(10));
         panel.addView(sub, match());
 
         boolean pinned = dockApps().contains(pkg);
-        TextView pin = menuButton(pinned ? "Lepas dari dock" : "Sematkan ke dock");
+        TextView pin = menuButton(pinned
+                ? L.t(this, "Lepas dari dock", "Remove from dock")
+                : L.t(this, "Sematkan ke dock", "Pin to dock"));
         pin.setOnClickListener(v -> {
             closeTileMenu();
             toggleDockPin(pkg);
         });
         panel.addView(pin, menuLp(false));
 
-        TextView info = menuButton("Info aplikasi");
+        TextView info = menuButton(L.t(this, "Info aplikasi", "App info"));
         info.setOnClickListener(v -> {
             closeTileMenu();
             launch(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -1791,7 +1805,7 @@ public class HomeActivity extends Activity {
         });
         panel.addView(info, menuLp(false));
 
-        TextView hide = menuButton("Sembunyikan dari Home");
+        TextView hide = menuButton(L.t(this, "Sembunyikan dari Home", "Hide from Home"));
         hide.setOnClickListener(v -> {
             closeTileMenu();
             LauncherPrefs.hideApp(this, pkg);
@@ -1800,12 +1814,13 @@ public class HomeActivity extends Activity {
                 fillApps();
                 if (appsGrid.getChildCount() > 0) appsGrid.getChildAt(0).requestFocus();
             }
-            Toast.makeText(this, "Disembunyikan dari Home", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, L.t(this, "Disembunyikan dari Home", "Hidden from Home"),
+                    Toast.LENGTH_SHORT).show();
         });
         panel.addView(hide, menuLp(false));
 
         if (!isSystemApp(pkg)) {
-            TextView uninstall = menuButton("Copot pemasangan");
+            TextView uninstall = menuButton(L.t(this, "Copot pemasangan", "Uninstall"));
             uninstall.setOnClickListener(v -> {
                 closeTileMenu();
                 launch(new Intent(Intent.ACTION_DELETE, Uri.fromParts("package", pkg, null)));
@@ -1813,7 +1828,7 @@ public class HomeActivity extends Activity {
             panel.addView(uninstall, menuLp(false));
         }
 
-        TextView cancel = menuButton("Batal");
+        TextView cancel = menuButton(L.t(this, "Batal", "Cancel"));
         cancel.setOnClickListener(v -> closeTileMenu());
         panel.addView(cancel, menuLp(true));
 
@@ -1875,15 +1890,18 @@ public class HomeActivity extends Activity {
         List<String> dockNow = new ArrayList<>(dockApps());
         if (dockNow.remove(pkg)) {
             LauncherPrefs.setDockApps(this, dockNow);
-            Toast.makeText(this, "Dilepas dari dock", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, L.t(this, "Dilepas dari dock", "Removed from dock"),
+                    Toast.LENGTH_SHORT).show();
         } else {
             if (dockNow.size() >= DOCK_SIZE) {
-                Toast.makeText(this, "Dock penuh (6 aplikasi)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, L.t(this, "Dock penuh (6 aplikasi)", "Dock is full (6 apps)"),
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
             dockNow.add(pkg);
             LauncherPrefs.setDockApps(this, dockNow);
-            Toast.makeText(this, "Disematkan ke dock", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, L.t(this, "Disematkan ke dock", "Pinned to dock"),
+                    Toast.LENGTH_SHORT).show();
         }
         fillDock();
     }
@@ -1959,8 +1977,8 @@ public class HomeActivity extends Activity {
         words.addView(nowProgress, pl);
         card.addView(words, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
-        nowPrev = skipButton(R.drawable.ic_skip_previous, "Sebelumnya", -1);
-        nowNext = skipButton(R.drawable.ic_skip_next, "Berikutnya", 1);
+        nowPrev = skipButton(R.drawable.ic_skip_previous, L.t(this, "Sebelumnya", "Previous"), -1);
+        nowNext = skipButton(R.drawable.ic_skip_next, L.t(this, "Berikutnya", "Next"), 1);
         LinearLayout.LayoutParams prevLp = new LinearLayout.LayoutParams(dp(36), dp(36));
         prevLp.setMarginEnd(dp(4));
         card.addView(nowPrev, prevLp);
