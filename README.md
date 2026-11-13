@@ -135,14 +135,16 @@ setup/                     APK siap pasang, installer, patch, dokumentasi, scree
 
 ## Status uji
 
-Diuji pada TV Android 14 (SDK 34), resolusi 1280×720, arsitektur `armeabi-v7a`:
+Diuji pada TV Android 14 (SDK 34), resolusi 1280×720, arsitektur `armeabi-v7a` untuk build 0.1.7:
 
 - Home, sapaan Indonesia, dock, dan Now Playing berjalan.
-- Bahasa Indonesia dan English bisa dipilih di Pengaturan launcher → Bahasa; sapaan,
-  tanggal, menu tile, dock, dan screensaver mengikuti pilihan tersebut.
 - Quick settings baru terbuka dan seluruh 9 tile, slider, dan footer terlihat.
-- Halaman Launcher settings menampilkan `ianvex tv launcher 0.1.8`.
+- Halaman Launcher settings menampilkan `ianvex tv launcher 0.1.7`.
 - Home button dan screensaver tetap berfungsi.
+
+Build **0.1.8** menambahkan pilihan bahasa Indonesia/English. Build berhasil dibuat
+(versionCode 231, versionName 0.1.8) dan APK sudah diunggah, tetapi uji langsung di TV
+belum dijalankan karena TV tidak terjangkau dari lingkungan build saat rilis.
 
 ## Sosial media
 

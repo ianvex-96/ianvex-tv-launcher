@@ -136,14 +136,16 @@ setup/                     ready-to-install APK, installer, patch, docs, screens
 
 ## Test status
 
-Tested on an Android 14 TV (SDK 34), 1280×720, `armeabi-v7a`:
+Tested on an Android 14 TV (SDK 34), 1280×720, `armeabi-v7a` for build 0.1.7:
 
 - Home, the Indonesian greeting, the dock, and Now Playing work.
-- Indonesian and English can be chosen in Launcher settings → Language; the greeting,
-  date, tile menu, dock, and screensaver follow that choice.
 - The new quick settings opens with all 9 tiles, sliders, and the footer visible.
-- The Launcher settings page shows `ianvex tv launcher 0.1.8`.
+- The Launcher settings page shows `ianvex tv launcher 0.1.7`.
 - The Home button and screensaver still work.
+
+Build **0.1.8** adds the Indonesian/English language choice. The build succeeded
+(versionCode 231, versionName 0.1.8) and the APK is uploaded, but the on-TV test has not
+run yet because the TV was unreachable from the build environment at release time.
 
 ## Social media
 
