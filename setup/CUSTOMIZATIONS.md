@@ -1,4 +1,4 @@
-# ianvex tv launcher customizations (0.1.7, versionCode 230)
+# ianvex tv launcher customizations (0.1.8, versionCode 231)
 
 Built from the upstream Material TV Launcher source with debug signing. The installed app
 replaces the official 0.1.5 release, so an official update needs an uninstall first.
@@ -10,7 +10,8 @@ replaces the official 0.1.5 release, so an official update needs an uninstall fi
   (falls back to "Wi-Fi" when disconnected) and tapping it opens the TV's Wi-Fi settings.
   Ask is still available through the remote microphone / AssistService.
 - **Indonesian date and 24-hour clock**: Home, quick settings, and the screensaver show
-  `HH:mm` and an Indonesian date such as "Rabu, 11 November" (independent of the TV language).
+  `HH:mm` and a date such as "Rabu, 11 November" (independent of the TV language).
+  Choosing English switches the date to "Wednesday, 11 November".
 - **Greeting**: under the date, a time-based Indonesian greeting with a configurable name:
   "Selamat pagi/siang/sore/malam, Nafil Julio Firmansyah". The name and the whole greeting
   can be changed or turned off in launcher settings; a blank name shows the greeting alone.
@@ -35,6 +36,9 @@ replaces the official 0.1.5 release, so an official update needs an uninstall fi
   - a full-width brightness pill first, then the volume pill, both with a live percentage
   - Dock apps (opens the dock picker) and Tutup (closes the shade)
 - **Launcher settings** (quick settings > Launcher):
+  - **Bahasa / Language**: Indonesian (default), English, or follow the TV's system language.
+    Changing it recreates the settings screen and Home; the greeting, date, tile menu, dock
+    picker, and screensaver labels follow the choice.
   - **Sapaan**: edit the greeting name, toggle the greeting on/off, reset to the default name.
   - **Warna**: eight accent colors plus "Ikuti warna aplikasi". Picking an accent applies it
     everywhere and turns dynamic color off; the dynamic toggle restores per-app colors.

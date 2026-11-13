@@ -8,6 +8,8 @@ Fork dari [0xRampey/material-tv-launcher](https://github.com/0xRampey/material-t
 dikustomisasi untuk TV ianvex. Tanpa iklan, tanpa rekomendasi, dengan warna dinamis
 Material You dan dukungan voice Gemini opsional (membawa API key OpenRouter sendiri).
 
+**Bahasa:** [Bahasa Indonesia](README.md) · [English](README.en.md)
+
 [![Facebook](https://img.shields.io/badge/Facebook-ianvex.id-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/ianvex.id)
 [![GitHub](https://img.shields.io/badge/GitHub-ianvex--96-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ianvex-96)
 [![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ianvex-96/ianvex-tv-launcher/releases/latest/download/ianvex-tv-launcher.apk)
@@ -19,6 +21,8 @@ Material You dan dukungan voice Gemini opsional (membawa API key OpenRouter send
 ## Fitur utama
 
 - **Nama ianvex tv launcher** di launcher, dialog, dan halaman About.
+- **Dua bahasa**: Indonesia (bawaan) dan English, bisa dipilih di Pengaturan launcher →
+  Bahasa. Ada juga opsi “Ikuti sistem”.
 - **Quick settings gaya Android 17**: panel di tengah dengan sudut membulat, drag handle,
   jam besar + tanggal Indonesia, grid 3×3 tile besar (ikon bulat, label tebal, status hidup),
   tile aktif berwarna solid, slider kecerahan lalu volume, serta footer Dock apps / Tutup.
@@ -36,7 +40,8 @@ Material You dan dukungan voice Gemini opsional (membawa API key OpenRouter send
 ## Screenshot
 
 Semua screenshot diambil langsung dari TV Android 14 (1280×720) yang menjalankan build 0.1.7.
-Klik gambar untuk membuka versi penuhnya.
+Klik gambar untuk membuka versi penuhnya. Tampilan **English** tersedia di
+Pengaturan launcher → Bahasa.
 
 ### Home, Apps, dan quick settings
 
@@ -94,7 +99,7 @@ bash setup/uninstall.sh 192.168.7.102
 ```
 
 APK siap pasang ada di [`setup/ianvex-tv-launcher.apk`](setup/ianvex-tv-launcher.apk)
-(build 230, versionName 0.1.7). Detail perubahan dan izin ada di
+(build 231, versionName 0.1.8). Detail perubahan dan izin ada di
 [`setup/CUSTOMIZATIONS.md`](setup/CUSTOMIZATIONS.md).
 
 ## Build sendiri
@@ -104,7 +109,7 @@ Butuh Android SDK platform 34, build-tools 34.0.0, dan JDK 17+.
 ```sh
 ANDROID_HOME=/path/to/android-sdk \
 BUILD_TOOLS=34.0.0 \
-VERSION_CODE=230 VERSION_NAME=0.1.7 \
+VERSION_CODE=231 VERSION_NAME=0.1.8 \
 bash build.sh
 ```
 
@@ -133,8 +138,10 @@ setup/                     APK siap pasang, installer, patch, dokumentasi, scree
 Diuji pada TV Android 14 (SDK 34), resolusi 1280×720, arsitektur `armeabi-v7a`:
 
 - Home, sapaan Indonesia, dock, dan Now Playing berjalan.
+- Bahasa Indonesia dan English bisa dipilih di Pengaturan launcher → Bahasa; sapaan,
+  tanggal, menu tile, dock, dan screensaver mengikuti pilihan tersebut.
 - Quick settings baru terbuka dan seluruh 9 tile, slider, dan footer terlihat.
-- Halaman Launcher settings menampilkan `ianvex tv launcher 0.1.7`.
+- Halaman Launcher settings menampilkan `ianvex tv launcher 0.1.8`.
 - Home button dan screensaver tetap berfungsi.
 
 ## Sosial media
