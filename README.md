@@ -63,6 +63,11 @@ Klik gambar untuk membuka versi penuhnya.
 | [![Quick settings](setup/screenshots/quick-settings.png)](setup/screenshots/quick-settings.png) |
 | Panel tengah dengan jam, 9 tile, slider kecerahan & volume, serta footer Dock apps / Tutup |
 
+| Quick settings gaya One UI (opsional) |
+|:---:|
+| [![Quick settings One UI](setup/screenshots/quick-oneui.png)](setup/screenshots/quick-oneui.png) |
+| Kartu ringkas di pojok kanan atas: 9 pill tile horizontal, tanpa drag handle |
+
 ### Pengaturan launcher
 
 | Pengaturan launcher | Warna aksen |
@@ -159,8 +164,18 @@ dengan build **0.1.8** (versionCode 231, versionName 0.1.8):
 Build 0.1.7 sebelumnya juga diuji di TV yang sama (Home, dock, Now Playing, quick settings,
 pengaturan, screensaver).
 
-Build **0.1.9** (versionCode 232) menambahkan gaya quick settings **One UI** di pojok kanan atas.
-Build dan pemeriksaan statis sudah selesai; uji langsung di TV dijadwalkan **15 November 2026**.
+Build **0.1.9** (versionCode 232) diuji langsung pada **15 November 2026**:
+
+- Install `adb install -r` berhasil; versi terpasang terverifikasi 0.1.9 (versionCode 232).
+- Gaya **Android 17** tetap sama: panel tengah, 9 tile, slider, dan footer tidak berubah.
+- Launcher settings → **Quick settings** → **One UI**: panel langsung menjadi kartu ringkas
+  di pojok kanan atas (±480×370 dp), tanpa drag handle, dan tidak terpotong layar.
+- 9 pill tile tersusun 3×3 dengan ikon di samping label dua baris; D-pad turun dari Wi-Fi ke
+  Mute, Apps, lalu footer, dan **Tutup** menutup panel.
+- Tile **Apps** membuka daftar aplikasi dan **Launcher** membuka pengaturan launcher.
+- Slider berfungsi: kecerahan 40% → 45% → 40%, volume 15% → 20% → 15%.
+- Dikembalikan ke gaya Android 17; bahasa Indonesia, screensaver, dan waktu tidur layar
+  (600.000 ms) tetap seperti sebelumnya.
 
 ## Sosial media
 

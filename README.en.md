@@ -64,6 +64,11 @@ the English Home screenshot is build 0.1.8. Click an image to open the full-size
 | [![Quick settings](setup/screenshots/quick-settings.png)](setup/screenshots/quick-settings.png) |
 | Centered panel with clock, 9 tiles, brightness & volume sliders, and the Dock apps / Close footer |
 
+| Optional One UI-style quick settings |
+|:---:|
+| [![Quick settings One UI](setup/screenshots/quick-oneui.png)](setup/screenshots/quick-oneui.png) |
+| Compact card in the top-right corner: nine horizontal pill tiles, no drag handle |
+
 ### Launcher settings
 
 | Launcher settings | Accent colors |
@@ -159,8 +164,18 @@ Tested on an Android 14 TV (SDK 34), 1280×720, `armeabi-v7a`, with build **0.1.
 Build 0.1.7 was previously tested on the same TV (Home, dock, Now Playing, quick settings,
 settings, screensaver).
 
-Build **0.1.9** (versionCode 232) adds the **One UI** quick settings style in the top-right
-corner. The build and static checks are done; the on-TV test is scheduled for **15 November 2026**.
+Build **0.1.9** (versionCode 232) was tested on **15 November 2026**:
+
+- `adb install -r` succeeded; the installed version was verified as 0.1.9 (versionCode 232).
+- The **Android 17** style is unchanged: centered panel, 9 tiles, sliders, and footer.
+- Launcher settings → **Quick settings** → **One UI** turns the panel into a compact card in
+  the top-right corner (±480×370 dp), with no drag handle and no clipping.
+- The nine pill tiles sit in a 3×3 grid (icon beside a two-line label); the D-pad walks from
+  Wi-Fi down to Mute, Apps, then the footer, and **Close** dismisses the panel.
+- The **Apps** tile opens the app grid and **Launcher** opens launcher settings.
+- Sliders work: brightness 40% → 45% → 40%, volume 15% → 20% → 15%.
+- Switched back to the Android 17 style; Indonesian, the screensaver, and the screen timeout
+  (600,000 ms) are unchanged.
 
 ## Social media
 
