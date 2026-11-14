@@ -39,9 +39,9 @@ Material You dan dukungan voice Gemini opsional (membawa API key OpenRouter send
 
 ## Screenshot
 
-Semua screenshot diambil langsung dari TV Android 14 (1280×720) yang menjalankan build 0.1.7.
-Klik gambar untuk membuka versi penuhnya. Tampilan **English** tersedia di
-Pengaturan launcher → Bahasa.
+Semua screenshot diambil langsung dari TV Android 14 (1280×720). Sebagian besar dari build 0.1.7
+dalam bahasa Indonesia; screenshot Home versi **English** diambil dari build 0.1.8.
+Klik gambar untuk membuka versi penuhnya.
 
 ### Home, Apps, dan quick settings
 
@@ -49,6 +49,11 @@ Pengaturan launcher → Bahasa.
 |:---:|:---:|
 | [![Home](setup/screenshots/home.png)](setup/screenshots/home.png) | [![Apps](setup/screenshots/apps.png)](setup/screenshots/apps.png) |
 | Sapaan Indonesia, Now Playing, dan dock 6 aplikasi | Grid semua aplikasi terpasang |
+
+| Home versi English (0.1.8) |
+|:---:|
+| [![Home English](setup/screenshots/home-en.png)](setup/screenshots/home-en.png) |
+| Sapaan dan tanggal English setelah memilih English di Pengaturan launcher → Bahasa |
 
 | Quick settings gaya Android 17 |
 |:---:|
@@ -135,16 +140,21 @@ setup/                     APK siap pasang, installer, patch, dokumentasi, scree
 
 ## Status uji
 
-Diuji pada TV Android 14 (SDK 34), resolusi 1280×720, arsitektur `armeabi-v7a` untuk build 0.1.7:
+Diuji langsung di TV Android 14 (SDK 34), resolusi 1280×720, arsitektur `armeabi-v7a`,
+dengan build **0.1.8** (versionCode 231, versionName 0.1.8):
 
-- Home, sapaan Indonesia, dock, dan Now Playing berjalan.
+- Install `adb install -r` berhasil; versi terpasang terverifikasi 0.1.8.
+- Home tampil normal: `Sabtu, 14 November` dan `Selamat malam, Nafil Julio Firmansyah`.
+- Pengaturan launcher → Bahasa: **English** langsung diterapkan tanpa restart. Home berubah
+  menjadi `Saturday, 14 November` dan `Good night, Nafil Julio Firmansyah`.
+- Quick settings, menu tile (tahan OK), dock picker, dan screensaver ikut berbahasa English.
+- Opsi **Ikuti sistem** mengikuti locale TV (`id-ID`) dan menampilkan bahasa Indonesia.
+- Kembali ke **Indonesia** sebagai bawaan; Home Indonesia tampil lagi.
 - Quick settings baru terbuka dan seluruh 9 tile, slider, dan footer terlihat.
-- Halaman Launcher settings menampilkan `ianvex tv launcher 0.1.7`.
 - Home button dan screensaver tetap berfungsi.
 
-Build **0.1.8** menambahkan pilihan bahasa Indonesia/English. Build berhasil dibuat
-(versionCode 231, versionName 0.1.8) dan APK sudah diunggah, tetapi uji langsung di TV
-belum dijalankan karena TV tidak terjangkau dari lingkungan build saat rilis.
+Build 0.1.7 sebelumnya juga diuji di TV yang sama (Home, dock, Now Playing, quick settings,
+pengaturan, screensaver).
 
 ## Sosial media
 

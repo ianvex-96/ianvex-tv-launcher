@@ -41,9 +41,8 @@ and optional Gemini voice (bring your own OpenRouter API key).
 
 ## Screenshots
 
-All screenshots come straight from an Android 14 TV (1280×720) running build 0.1.7 in Indonesian.
-Click an image to open the full-size version. The English UI is available in the launcher
-(Launcher settings → Language).
+All screenshots come straight from an Android 14 TV (1280×720). Most are build 0.1.7 in Indonesian;
+the English Home screenshot is build 0.1.8. Click an image to open the full-size version.
 
 ### Home, Apps, and quick settings
 
@@ -51,6 +50,11 @@ Click an image to open the full-size version. The English UI is available in the
 |:---:|:---:|
 | [![Home](setup/screenshots/home.png)](setup/screenshots/home.png) | [![Apps](setup/screenshots/apps.png)](setup/screenshots/apps.png) |
 | Indonesian greeting, Now Playing, and the 6-app dock | Grid of every installed app |
+
+| Home in English (0.1.8) |
+|:---:|
+| [![Home in English](setup/screenshots/home-en.png)](setup/screenshots/home-en.png) |
+| English greeting and date after choosing English in Launcher settings → Language |
 
 | Android 17-style quick settings |
 |:---:|
@@ -136,16 +140,21 @@ setup/                     ready-to-install APK, installer, patch, docs, screens
 
 ## Test status
 
-Tested on an Android 14 TV (SDK 34), 1280×720, `armeabi-v7a` for build 0.1.7:
+Tested on an Android 14 TV (SDK 34), 1280×720, `armeabi-v7a`, with build **0.1.8**
+(versionCode 231, versionName 0.1.8):
 
-- Home, the Indonesian greeting, the dock, and Now Playing work.
-- The new quick settings opens with all 9 tiles, sliders, and the footer visible.
-- The Launcher settings page shows `ianvex tv launcher 0.1.7`.
+- `adb install -r` succeeded; the installed version was verified as 0.1.8.
+- Home shows normally: `Sabtu, 14 November` and `Selamat malam, Nafil Julio Firmansyah`.
+- Launcher settings → Language → **English** applied immediately, without a restart. Home
+  switched to `Saturday, 14 November` and `Good night, Nafil Julio Firmansyah`.
+- Quick settings, the tile menu (hold OK), the dock picker, and the screensaver followed English.
+- **Follow system** honoured the TV locale (`id-ID`) and showed Indonesian.
+- Switched back to **Indonesia** as the default; Home showed Indonesian again.
+- The quick settings panel opens with all 9 tiles, sliders, and the footer visible.
 - The Home button and screensaver still work.
 
-Build **0.1.8** adds the Indonesian/English language choice. The build succeeded
-(versionCode 231, versionName 0.1.8) and the APK is uploaded, but the on-TV test has not
-run yet because the TV was unreachable from the build environment at release time.
+Build 0.1.7 was previously tested on the same TV (Home, dock, Now Playing, quick settings,
+settings, screensaver).
 
 ## Social media
 
