@@ -82,6 +82,7 @@ public class LauncherSettingsActivity extends Activity {
         buildLanguage(content);
         buildGreeting(content);
         buildTheme(content);
+        buildQuickStyle(content);
         buildScreensaver(content);
         buildHidden(content);
         buildAbout(content);
@@ -248,6 +249,39 @@ public class LauncherSettingsActivity extends Activity {
     private static int indexOf(int seed) {
         for (int i = 0; i < SEEDS.length; i++) if (SEEDS[i] == seed) return i;
         return 0;
+    }
+
+    // ---- quick settings style ----
+
+    private void buildQuickStyle(LinearLayout parent) {
+        section(parent, L.t(this, "Quick settings", "Quick settings"));
+        TextView hint = text(L.t(this,
+                        "Pilih gaya panel quick settings. Android 17 tampil di tengah; One UI tampil ringkas di pojok kanan atas.",
+                        "Choose the quick settings panel style. Android 17 sits in the center; One UI is a compact card in the top-right corner."),
+                12, palette.onSurfaceVariant, 500);
+        hint.setPadding(dp(2), 0, 0, dp(8));
+        parent.addView(hint, match());
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        int current = LauncherPrefs.quickStyle(this);
+        String[] labels = {
+                L.t(this, "Android 17", "Android 17"),
+                L.t(this, "One UI", "One UI")};
+        int[] values = {LauncherPrefs.QUICK_ANDROID17, LauncherPrefs.QUICK_ONE_UI};
+        for (int i = 0; i < labels.length; i++) {
+            final int value = values[i];
+            TextView chip = chip(labels[i], value == current, () -> {
+                LauncherPrefs.setQuickStyle(this, value);
+                recreate();
+            });
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            if (i > 0) lp.setMarginStart(dp(8));
+            row.addView(chip, lp);
+        }
+        parent.addView(row, match());
     }
 
     // ---- screensaver ----

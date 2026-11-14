@@ -1,4 +1,4 @@
-# ianvex tv launcher customizations (0.1.8, versionCode 231)
+# ianvex tv launcher customizations (0.1.9, versionCode 232)
 
 Built from the upstream Material TV Launcher source with debug signing. The installed app
 replaces the official 0.1.5 release, so an official update needs an uninstall first.
@@ -35,7 +35,12 @@ replaces the official 0.1.5 release, so an official update needs an uninstall fi
   - Pengaturan TV (opens the TV's main settings)
   - a full-width brightness pill first, then the volume pill, both with a live percentage
   - Dock apps (opens the dock picker) and Tutup (closes the shade)
+  - **Gaya One UI** (optional, Launcher settings → Quick settings): the same nine tiles as a
+    compact 480dp card anchored in the top-right corner, with 3×3 horizontal pill tiles
+    (icon beside a two-line label), smaller sliders and footer, and no drag handle. Android 17
+    stays the default style.
 - **Launcher settings** (quick settings > Launcher):
+  - **Quick settings**: choose the Android 17 (centered) or One UI (top-right) panel style.
   - **Bahasa / Language**: Indonesian (default), English, or follow the TV's system language.
     Changing it recreates the settings screen and Home; the greeting, date, tile menu, dock
     picker, and screensaver labels follow the choice.

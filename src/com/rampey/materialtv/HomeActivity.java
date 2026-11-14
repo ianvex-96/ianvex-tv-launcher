@@ -143,6 +143,8 @@ public class HomeActivity extends Activity {
     private FrameLayout quickOverlay;
     private View quickReturnFocus;
     private TextView quickTime, quickDate;
+    /** True while the panel is built in the compact One UI style. */
+    private boolean quickCompact;
     private FrameLayout tileMenu;
     private View tileMenuReturnFocus;
     private int appliedAccent;
@@ -1238,9 +1240,10 @@ public class HomeActivity extends Activity {
         QuickTile(int iconRes, String label, String status, boolean on) {
             this.on = on;
             view = new LinearLayout(HomeActivity.this);
-            view.setOrientation(LinearLayout.VERTICAL);
-            view.setGravity(Gravity.TOP);
-            view.setPadding(dp(13), dp(9), dp(12), dp(8));
+            view.setOrientation(quickCompact ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+            view.setGravity(quickCompact ? Gravity.CENTER_VERTICAL : Gravity.TOP);
+            view.setPadding(dp(quickCompact ? 10 : 13), dp(quickCompact ? 6 : 9),
+                    dp(quickCompact ? 8 : 12), dp(quickCompact ? 6 : 8));
             view.setFocusable(true);
             view.setFocusableInTouchMode(true);
             view.setClickable(true);
@@ -1250,24 +1253,41 @@ public class HomeActivity extends Activity {
             iconWrap.setBackground(iconShape);
             icon = new ImageView(HomeActivity.this);
             icon.setImageResource(iconRes);
-            iconWrap.addView(icon, new FrameLayout.LayoutParams(dp(17), dp(17), Gravity.CENTER));
-            view.addView(iconWrap, new LinearLayout.LayoutParams(dp(28), dp(28)));
+            int iconDp = quickCompact ? 14 : 17;
+            iconWrap.addView(icon, new FrameLayout.LayoutParams(dp(iconDp), dp(iconDp), Gravity.CENTER));
+            view.addView(iconWrap, new LinearLayout.LayoutParams(
+                    dp(quickCompact ? 24 : 28), dp(quickCompact ? 24 : 28)));
 
-            title = text(label, 14, palette.onSurface, 700);
+            title = text(label, quickCompact ? 12 : 14, palette.onSurface, 700);
             title.setIncludeFontPadding(false);
             title.setSingleLine(true);
             title.setEllipsize(TextUtils.TruncateAt.END);
-            LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            titleLp.topMargin = dp(5);
-            view.addView(title, titleLp);
 
-            subtitle = text(status, 11, palette.onSurfaceVariant, 500);
+            subtitle = text(status, quickCompact ? 9.5f : 11, palette.onSurfaceVariant, 500);
             subtitle.setIncludeFontPadding(false);
             subtitle.setSingleLine(true);
             subtitle.setEllipsize(TextUtils.TruncateAt.END);
-            view.addView(subtitle, new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            if (quickCompact) {
+                // One UI's tile: the icon sits beside a two-line label, not above it.
+                LinearLayout column = new LinearLayout(HomeActivity.this);
+                column.setOrientation(LinearLayout.VERTICAL);
+                column.addView(title, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                column.addView(subtitle, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                LinearLayout.LayoutParams columnLp = new LinearLayout.LayoutParams(
+                        0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+                columnLp.setMarginStart(dp(8));
+                view.addView(column, columnLp);
+            } else {
+                LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                titleLp.topMargin = dp(5);
+                view.addView(title, titleLp);
+                view.addView(subtitle, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
 
             // No scale on focus: the tile keeps its exact Android grid cell.
             view.setOnFocusChangeListener((v, focused) -> paint());
@@ -1311,7 +1331,7 @@ public class HomeActivity extends Activity {
                 iconFill = withAlpha(palette.onSurfaceVariant, 0x1F);
             }
             GradientDrawable bg = new GradientDrawable();
-            bg.setCornerRadius(dp(24));
+            bg.setCornerRadius(dp(quickCompact ? 18 : 24));
             bg.setColor(fill);
             if (focused) bg.setStroke(dp(2), on ? palette.onPrimary : palette.primary);
             view.setBackground(bg);
@@ -1323,8 +1343,9 @@ public class HomeActivity extends Activity {
         }
 
         void addTo(LinearLayout row, boolean first) {
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(86), 1f);
-            if (!first) lp.setMarginStart(dp(7));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    0, dp(quickCompact ? 56 : 86), 1f);
+            if (!first) lp.setMarginStart(dp(quickCompact ? 6 : 7));
             row.addView(view, lp);
         }
     }
@@ -1426,7 +1447,7 @@ public class HomeActivity extends Activity {
         for (int i = 0; i < tiles.length; i++) tiles[i].addTo(row, i == 0);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        if (gap) lp.topMargin = dp(7);
+        if (gap) lp.topMargin = dp(quickCompact ? 6 : 7);
         parent.addView(row, lp);
     }
 
@@ -1477,6 +1498,7 @@ public class HomeActivity extends Activity {
 
     private void openQuickSettings() {
         if (quickOverlay != null || rootView == null) return;
+        quickCompact = LauncherPrefs.quickStyle(this) == LauncherPrefs.QUICK_ONE_UI;
         quickReturnFocus = getCurrentFocus();
         // Keep the remote's focus inside the panel while it is open.
         if (mainColumn != null) mainColumn.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
@@ -1490,50 +1512,60 @@ public class HomeActivity extends Activity {
 
         LinearLayout panel = new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
-        panel.setPadding(dp(14), dp(12), dp(14), dp(12));
+        panel.setPadding(dp(quickCompact ? 12 : 14), dp(quickCompact ? 10 : 12),
+                dp(quickCompact ? 12 : 14), dp(quickCompact ? 10 : 12));
         panel.setClickable(true);
         panel.setOnClickListener(v -> {
             // Swallow clicks inside the panel so they do not reach the dimmed launcher behind it.
         });
         GradientDrawable panelBg = new GradientDrawable();
-        panelBg.setCornerRadius(dp(32));
+        panelBg.setCornerRadius(dp(quickCompact ? 28 : 32));
         panelBg.setColor(withAlpha(palette.containerHigh, 0xF7));
         panelBg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x33));
         panel.setBackground(panelBg);
         panel.setElevation(dp(24));
         FrameLayout.LayoutParams panelLp = new FrameLayout.LayoutParams(
-                dp(600), ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-        panelLp.setMargins(dp(16), dp(10), dp(16), dp(10));
+                dp(quickCompact ? 480 : 600), ViewGroup.LayoutParams.WRAP_CONTENT,
+                quickCompact ? (Gravity.TOP | Gravity.END) : Gravity.CENTER);
+        if (quickCompact) {
+            // A compact card in the top-right corner, clear of the 48 dp overscan margin.
+            panelLp.setMargins(dp(16), dp(40), dp(40), dp(16));
+        } else {
+            panelLp.setMargins(dp(16), dp(10), dp(16), dp(10));
+        }
         overlay.addView(panel, panelLp);
 
-        // Android's little drag handle at the top of the shade.
-        View handle = new View(this);
-        GradientDrawable handleBg = new GradientDrawable();
-        handleBg.setCornerRadius(dp(2));
-        handleBg.setColor(withAlpha(palette.onSurfaceVariant, 0x66));
-        handle.setBackground(handleBg);
-        LinearLayout handleRow = new LinearLayout(this);
-        handleRow.setGravity(Gravity.CENTER);
-        handleRow.addView(handle, new LinearLayout.LayoutParams(dp(36), dp(4)));
-        LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        handleLp.bottomMargin = dp(8);
-        panel.addView(handleRow, handleLp);
+        if (!quickCompact) {
+            // Android's little drag handle at the top of the shade. One UI's corner card has none.
+            View handle = new View(this);
+            GradientDrawable handleBg = new GradientDrawable();
+            handleBg.setCornerRadius(dp(2));
+            handleBg.setColor(withAlpha(palette.onSurfaceVariant, 0x66));
+            handle.setBackground(handleBg);
+            LinearLayout handleRow = new LinearLayout(this);
+            handleRow.setGravity(Gravity.CENTER);
+            handleRow.addView(handle, new LinearLayout.LayoutParams(dp(36), dp(4)));
+            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            handleLp.bottomMargin = dp(8);
+            panel.addView(handleRow, handleLp);
+        }
 
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(0, 0, 0, dp(8));
+        header.setPadding(0, 0, 0, dp(quickCompact ? 6 : 8));
         LinearLayout headerLeft = new LinearLayout(this);
         headerLeft.setOrientation(LinearLayout.VERTICAL);
-        quickTime = text(Dates.time(new Date()), 28, palette.onSurface, 760);
+        quickTime = text(Dates.time(new Date()), quickCompact ? 22 : 28, palette.onSurface, 760);
         quickTime.setIncludeFontPadding(false);
         headerLeft.addView(quickTime, match());
-        quickDate = text(Dates.date(new Date(), L.english(this)), 11, palette.onSurfaceVariant, 500);
+        quickDate = text(Dates.date(new Date(), L.english(this)), quickCompact ? 10 : 11,
+                palette.onSurfaceVariant, 500);
         quickDate.setIncludeFontPadding(false);
         headerLeft.addView(quickDate, match());
         header.addView(headerLeft, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        TextView headerTitle = text("Quick settings", 11, palette.onSurfaceVariant, 650);
+        TextView headerTitle = text("Quick settings", quickCompact ? 10 : 11, palette.onSurfaceVariant, 650);
         headerTitle.setGravity(Gravity.END);
         header.addView(headerTitle, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -1641,7 +1673,7 @@ public class HomeActivity extends Activity {
             }
         }, new SeekBar[1]);
         LinearLayout.LayoutParams brightnessLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(42));
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(quickCompact ? 36 : 42));
         panel.addView(brightness, brightnessLp);
 
         AudioManager am = getSystemService(AudioManager.class);
@@ -1652,8 +1684,8 @@ public class HomeActivity extends Activity {
             if (audio != null) audio.setStreamVolume(AudioManager.STREAM_MUSIC, value, 0);
         }, volumeBar);
         LinearLayout.LayoutParams volumeLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(42));
-        volumeLp.topMargin = dp(6);
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(quickCompact ? 36 : 42));
+        volumeLp.topMargin = dp(quickCompact ? 5 : 6);
         panel.addView(volume, volumeLp);
 
         LinearLayout grid = new LinearLayout(this);
@@ -1663,7 +1695,7 @@ public class HomeActivity extends Activity {
         addQuickRow(grid, true, appsTile, launcherTile, settingsTile);
         LinearLayout.LayoutParams gridLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        gridLp.topMargin = dp(8);
+        gridLp.topMargin = dp(quickCompact ? 6 : 8);
         panel.addView(grid, gridLp);
 
         TextView dockApps = quickFooterButton("Dock apps", R.drawable.ic_apps);
@@ -1676,20 +1708,27 @@ public class HomeActivity extends Activity {
         LinearLayout footer = new LinearLayout(this);
         footer.setOrientation(LinearLayout.HORIZONTAL);
         footer.setGravity(Gravity.CENTER_VERTICAL);
-        footer.addView(dockApps, new LinearLayout.LayoutParams(0, dp(40), 1f));
+        int footerHeight = dp(quickCompact ? 34 : 40);
+        footer.addView(dockApps, new LinearLayout.LayoutParams(0, footerHeight, 1f));
         View footerGap = new View(this);
         footer.addView(footerGap, new LinearLayout.LayoutParams(dp(8), dp(1)));
-        footer.addView(closePanel, new LinearLayout.LayoutParams(0, dp(40), 1f));
+        footer.addView(closePanel, new LinearLayout.LayoutParams(0, footerHeight, 1f));
         LinearLayout.LayoutParams footerLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        footerLp.topMargin = dp(8);
+        footerLp.topMargin = dp(quickCompact ? 6 : 8);
         panel.addView(footer, footerLp);
 
         rootView.addView(overlay, match());
         overlay.setAlpha(0f);
-        panel.setTranslationY(-dp(22));
+        if (quickCompact) {
+            // The corner card grows in from the top-right edge.
+            panel.setTranslationY(-dp(16));
+            panel.setTranslationX(dp(16));
+        } else {
+            panel.setTranslationY(-dp(22));
+        }
         overlay.animate().alpha(1f).setDuration(Motion.FAST_EFFECTS_MS).start();
-        panel.animate().translationY(0f).setDuration(Motion.DEFAULT_SPATIAL_MS)
+        panel.animate().translationY(0f).translationX(0f).setDuration(Motion.DEFAULT_SPATIAL_MS)
                 .setInterpolator(Motion.DEFAULT_SPATIAL).start();
         handler.removeCallbacks(quickTick);
         handler.post(quickTick);
@@ -1697,11 +1736,11 @@ public class HomeActivity extends Activity {
     }
 
     private TextView quickFooterButton(String label, int iconRes) {
-        TextView b = text(label, 13, palette.onSurface, 650);
+        TextView b = text(label, quickCompact ? 12 : 13, palette.onSurface, 650);
         if (iconRes != 0) {
             Drawable icon = getDrawable(iconRes);
             if (icon != null) {
-                icon.setBounds(0, 0, dp(18), dp(18));
+                icon.setBounds(0, 0, dp(quickCompact ? 16 : 18), dp(quickCompact ? 16 : 18));
                 icon.setTintList(ColorStateList.valueOf(palette.onSurface));
                 b.setCompoundDrawablesRelative(icon, null, null, null);
                 b.setCompoundDrawablePadding(dp(8));
@@ -1714,7 +1753,7 @@ public class HomeActivity extends Activity {
         b.setClickable(true);
         b.setDefaultFocusHighlightEnabled(false);
         GradientDrawable bg = new GradientDrawable();
-        bg.setCornerRadius(dp(20));
+        bg.setCornerRadius(dp(quickCompact ? 18 : 20));
         bg.setColor(palette.container);
         bg.setStroke(dp(1), withAlpha(palette.onSurfaceVariant, 0x22));
         b.setBackground(bg);
@@ -1726,7 +1765,7 @@ public class HomeActivity extends Activity {
             if (iconRes != 0) {
                 Drawable icon = getDrawable(iconRes);
                 if (icon != null) {
-                    icon.setBounds(0, 0, dp(18), dp(18));
+                    icon.setBounds(0, 0, dp(quickCompact ? 16 : 18), dp(quickCompact ? 16 : 18));
                     icon.setTintList(ColorStateList.valueOf(focused ? palette.primary : palette.onSurface));
                     b.setCompoundDrawablesRelative(icon, null, null, null);
                 }

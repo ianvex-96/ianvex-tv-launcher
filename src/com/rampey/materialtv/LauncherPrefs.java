@@ -21,6 +21,11 @@ final class LauncherPrefs {
     private static final String HIDDEN_APPS = "hidden_apps";
     private static final String SCREEN_OFF_RESTORE = "screen_off_restore";
     private static final String LANGUAGE = "language";
+    private static final String QUICK_STYLE = "quick_style";
+
+    /** Quick settings panel looks. Android 17 is the centered shade; One UI is the compact top-right card. */
+    static final int QUICK_ANDROID17 = 0;
+    static final int QUICK_ONE_UI = 1;
 
     static final String DEFAULT_GREETING_NAME = "Nafil Julio Firmansyah";
 
@@ -68,6 +73,16 @@ final class LauncherPrefs {
     static void setLanguage(Context context, int language) {
         prefs(context).edit().putInt(LANGUAGE,
                 Math.max(L.INDONESIAN, Math.min(L.SYSTEM, language))).apply();
+    }
+
+    static int quickStyle(Context context) {
+        int style = prefs(context).getInt(QUICK_STYLE, QUICK_ANDROID17);
+        return style == QUICK_ONE_UI ? QUICK_ONE_UI : QUICK_ANDROID17;
+    }
+
+    static void setQuickStyle(Context context, int style) {
+        prefs(context).edit().putInt(QUICK_STYLE,
+                style == QUICK_ONE_UI ? QUICK_ONE_UI : QUICK_ANDROID17).apply();
     }
 
     static int accentSeed(Context context) {

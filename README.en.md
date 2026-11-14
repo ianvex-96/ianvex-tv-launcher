@@ -26,6 +26,9 @@ and optional Gemini voice (bring your own OpenRouter API key).
 - **Android 17-style quick settings**: a centered panel with rounded corners, a drag handle,
   a large clock + date, a 3×3 grid of large tiles (round icons, bold labels, live status),
   solid active tiles, brightness then volume sliders, and a Dock apps / Close footer.
+- **Optional One UI style**: a compact ±480×370 dp card in the top-right corner, with a 3×3
+  grid of horizontal pill tiles (icon beside the label) and no drag handle. Chosen in
+  Launcher settings → Quick settings; Android 17 stays the default.
 - **Indonesian or English date & time**: `HH:mm` and dates such as “Kamis, 12 November”
   or “Thursday, 12 November”.
 - **Greeting**: “Selamat pagi/siang/sore/malam, Name” or “Good morning/afternoon/evening/night, Name”,
@@ -105,7 +108,7 @@ bash setup/uninstall.sh 192.168.7.102
 ```
 
 The ready-to-install APK is [`setup/ianvex-tv-launcher.apk`](setup/ianvex-tv-launcher.apk)
-(build 231, versionName 0.1.8). Changes and permissions are detailed in
+(build 232, versionName 0.1.9). Changes and permissions are detailed in
 [`setup/CUSTOMIZATIONS.md`](setup/CUSTOMIZATIONS.md).
 
 ## Build it yourself
@@ -115,7 +118,7 @@ You need Android SDK platform 34, build-tools 34.0.0, and JDK 17+.
 ```sh
 ANDROID_HOME=/path/to/android-sdk \
 BUILD_TOOLS=34.0.0 \
-VERSION_CODE=231 VERSION_NAME=0.1.8 \
+VERSION_CODE=232 VERSION_NAME=0.1.9 \
 bash build.sh
 ```
 
@@ -155,6 +158,9 @@ Tested on an Android 14 TV (SDK 34), 1280×720, `armeabi-v7a`, with build **0.1.
 
 Build 0.1.7 was previously tested on the same TV (Home, dock, Now Playing, quick settings,
 settings, screensaver).
+
+Build **0.1.9** (versionCode 232) adds the **One UI** quick settings style in the top-right
+corner. The build and static checks are done; the on-TV test is scheduled for **15 November 2026**.
 
 ## Social media
 

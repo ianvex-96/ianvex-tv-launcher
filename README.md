@@ -26,6 +26,9 @@ Material You dan dukungan voice Gemini opsional (membawa API key OpenRouter send
 - **Quick settings gaya Android 17**: panel di tengah dengan sudut membulat, drag handle,
   jam besar + tanggal Indonesia, grid 3×3 tile besar (ikon bulat, label tebal, status hidup),
   tile aktif berwarna solid, slider kecerahan lalu volume, serta footer Dock apps / Tutup.
+- **Gaya One UI (opsional)**: panel ringkas ±480×370 dp di pojok kanan atas, tile pill
+  horizontal 3×3 dengan ikon di samping label, tanpa drag handle. Dipilih di
+  Pengaturan launcher → Quick settings; gaya Android 17 tetap menjadi bawaan.
 - **Tanggal & jam Indonesia**: `HH:mm` dan tanggal seperti "Kamis, 12 November".
 - **Sapaan**: "Selamat pagi/siang/sore/malam, Nama" yang bisa diubah atau dimatikan.
 - **Warna aksen**: 8 pilihan warna + mode "Ikuti warna aplikasi" (dynamic color).
@@ -104,7 +107,7 @@ bash setup/uninstall.sh 192.168.7.102
 ```
 
 APK siap pasang ada di [`setup/ianvex-tv-launcher.apk`](setup/ianvex-tv-launcher.apk)
-(build 231, versionName 0.1.8). Detail perubahan dan izin ada di
+(build 232, versionName 0.1.9). Detail perubahan dan izin ada di
 [`setup/CUSTOMIZATIONS.md`](setup/CUSTOMIZATIONS.md).
 
 ## Build sendiri
@@ -114,7 +117,7 @@ Butuh Android SDK platform 34, build-tools 34.0.0, dan JDK 17+.
 ```sh
 ANDROID_HOME=/path/to/android-sdk \
 BUILD_TOOLS=34.0.0 \
-VERSION_CODE=231 VERSION_NAME=0.1.8 \
+VERSION_CODE=232 VERSION_NAME=0.1.9 \
 bash build.sh
 ```
 
@@ -155,6 +158,9 @@ dengan build **0.1.8** (versionCode 231, versionName 0.1.8):
 
 Build 0.1.7 sebelumnya juga diuji di TV yang sama (Home, dock, Now Playing, quick settings,
 pengaturan, screensaver).
+
+Build **0.1.9** (versionCode 232) menambahkan gaya quick settings **One UI** di pojok kanan atas.
+Build dan pemeriksaan statis sudah selesai; uji langsung di TV dijadwalkan **15 November 2026**.
 
 ## Sosial media
 
