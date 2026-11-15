@@ -113,7 +113,7 @@ bash setup/uninstall.sh 192.168.7.102
 ```
 
 The ready-to-install APK is [`setup/ianvex-tv-launcher.apk`](setup/ianvex-tv-launcher.apk)
-(build 232, versionName 0.1.9). Changes and permissions are detailed in
+(build 233, versionName 0.2.0). Changes and permissions are detailed in
 [`setup/CUSTOMIZATIONS.md`](setup/CUSTOMIZATIONS.md).
 
 ## Build it yourself
@@ -123,7 +123,7 @@ You need Android SDK platform 34, build-tools 34.0.0, and JDK 17+.
 ```sh
 ANDROID_HOME=/path/to/android-sdk \
 BUILD_TOOLS=34.0.0 \
-VERSION_CODE=232 VERSION_NAME=0.1.9 \
+VERSION_CODE=233 VERSION_NAME=0.2.0 \
 bash build.sh
 ```
 
@@ -176,6 +176,10 @@ Build **0.1.9** (versionCode 232) was tested on **15 November 2026**:
 - Sliders work: brightness 40% → 45% → 40%, volume 15% → 20% → 15%.
 - Switched back to the Android 17 style; Indonesian, the screensaver, and the screen timeout
   (600,000 ms) are unchanged.
+
+Build **0.2.0** (versionCode 233) makes the quick panel's D-pad order explicit: DOWN from a
+slider always lands on Wi-Fi, the grid steps column by column, and the last row steps into
+Dock apps / Close. The build is done; the on-TV check is pending.
 
 ## Social media
 

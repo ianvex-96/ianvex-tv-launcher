@@ -112,7 +112,7 @@ bash setup/uninstall.sh 192.168.7.102
 ```
 
 APK siap pasang ada di [`setup/ianvex-tv-launcher.apk`](setup/ianvex-tv-launcher.apk)
-(build 232, versionName 0.1.9). Detail perubahan dan izin ada di
+(build 233, versionName 0.2.0). Detail perubahan dan izin ada di
 [`setup/CUSTOMIZATIONS.md`](setup/CUSTOMIZATIONS.md).
 
 ## Build sendiri
@@ -122,7 +122,7 @@ Butuh Android SDK platform 34, build-tools 34.0.0, dan JDK 17+.
 ```sh
 ANDROID_HOME=/path/to/android-sdk \
 BUILD_TOOLS=34.0.0 \
-VERSION_CODE=232 VERSION_NAME=0.1.9 \
+VERSION_CODE=233 VERSION_NAME=0.2.0 \
 bash build.sh
 ```
 
@@ -176,6 +176,10 @@ Build **0.1.9** (versionCode 232) diuji langsung pada **15 November 2026**:
 - Slider berfungsi: kecerahan 40% → 45% → 40%, volume 15% → 20% → 15%.
 - Dikembalikan ke gaya Android 17; bahasa Indonesia, screensaver, dan waktu tidur layar
   (600.000 ms) tetap seperti sebelumnya.
+
+Build **0.2.0** (versionCode 233) merapikan urutan fokus D-pad di panel quick settings: DOWN
+dari slider selalu menuju Wi-Fi, grid berjalan per kolom, dan baris terakhir menuju
+Dock apps / Tutup. Build selesai; uji di TV menyusul.
 
 ## Sosial media
 

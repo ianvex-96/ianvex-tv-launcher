@@ -1,4 +1,4 @@
-# ianvex tv launcher customizations (0.1.9, versionCode 232)
+# ianvex tv launcher customizations (0.2.0, versionCode 233)
 
 Built from the upstream Material TV Launcher source with debug signing. The installed app
 replaces the official 0.1.5 release, so an official update needs an uninstall first.
@@ -39,6 +39,8 @@ replaces the official 0.1.5 release, so an official update needs an uninstall fi
     compact 480dp card anchored in the top-right corner, with 3×3 horizontal pill tiles
     (icon beside a two-line label), smaller sliders and footer, and no drag handle. Android 17
     stays the default style.
+  - **D-pad order** is wired explicitly (0.2.0): DOWN from either slider always lands on Wi-Fi,
+    the grid steps column by column, and the last row steps into Dock apps / Tutup.
 - **Launcher settings** (quick settings > Launcher):
   - **Quick settings**: choose the Android 17 (centered) or One UI (top-right) panel style.
   - **Bahasa / Language**: Indonesian (default), English, or follow the TV's system language.

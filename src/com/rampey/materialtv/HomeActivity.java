@@ -1248,6 +1248,7 @@ public class HomeActivity extends Activity {
             view.setFocusableInTouchMode(true);
             view.setClickable(true);
             view.setDefaultFocusHighlightEnabled(false);
+            view.setId(View.generateViewId());
 
             iconWrap = new FrameLayout(HomeActivity.this);
             iconWrap.setBackground(iconShape);
@@ -1449,6 +1450,46 @@ public class HomeActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         if (gap) lp.topMargin = dp(quickCompact ? 6 : 7);
         parent.addView(row, lp);
+    }
+
+    /**
+     * Explicit D-pad graph for the quick panel. Android's geometric focus search can hop from a
+     * full-width slider straight to the far tile, so every step is wired by hand: sliders down into
+     * the grid, the grid column by column, and the last row into the footer.
+     */
+    private void wireQuickFocus(SeekBar brightnessBar, SeekBar volumeBar,
+                                QuickTile[] grid, View dockApps, View closePanel) {
+        if (brightnessBar != null && volumeBar != null) {
+            brightnessBar.setId(View.generateViewId());
+            volumeBar.setId(View.generateViewId());
+            brightnessBar.setNextFocusDownId(volumeBar.getId());
+            volumeBar.setNextFocusUpId(brightnessBar.getId());
+            volumeBar.setNextFocusDownId(grid[0].view.getId());
+        }
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                View tile = grid[row * 3 + col].view;
+                if (col > 0) tile.setNextFocusLeftId(grid[row * 3 + col - 1].view.getId());
+                if (col < 2) tile.setNextFocusRightId(grid[row * 3 + col + 1].view.getId());
+                if (row > 0) {
+                    tile.setNextFocusUpId(grid[(row - 1) * 3 + col].view.getId());
+                } else if (volumeBar != null) {
+                    tile.setNextFocusUpId(volumeBar.getId());
+                }
+                if (row < 2) tile.setNextFocusDownId(grid[(row + 1) * 3 + col].view.getId());
+            }
+        }
+        if (dockApps != null && closePanel != null) {
+            dockApps.setId(View.generateViewId());
+            closePanel.setId(View.generateViewId());
+            grid[6].view.setNextFocusDownId(dockApps.getId());
+            grid[7].view.setNextFocusDownId(closePanel.getId());
+            grid[8].view.setNextFocusDownId(closePanel.getId());
+            dockApps.setNextFocusUpId(grid[6].view.getId());
+            closePanel.setNextFocusUpId(grid[8].view.getId());
+            dockApps.setNextFocusRightId(closePanel.getId());
+            closePanel.setNextFocusLeftId(dockApps.getId());
+        }
     }
 
     private void openSettingsAction(String action) {
@@ -1663,6 +1704,7 @@ public class HomeActivity extends Activity {
         } catch (Settings.SettingNotFoundException missing) {
             brightnessNow = 128;
         }
+        SeekBar[] brightnessBar = new SeekBar[1];
         View brightness = quickSlider(R.drawable.ic_brightness, 255, brightnessNow, value -> {
             try {
                 Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE,
@@ -1671,7 +1713,7 @@ public class HomeActivity extends Activity {
             } catch (RuntimeException ignored) {
                 // WRITE_SETTINGS is not granted; the slider still reflects the current level.
             }
-        }, new SeekBar[1]);
+        }, brightnessBar);
         LinearLayout.LayoutParams brightnessLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(quickCompact ? 36 : 42));
         panel.addView(brightness, brightnessLp);
@@ -1717,6 +1759,11 @@ public class HomeActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         footerLp.topMargin = dp(quickCompact ? 6 : 8);
         panel.addView(footer, footerLp);
+
+        wireQuickFocus(brightnessBar[0], volumeBar[0],
+                new QuickTile[]{wifiTile, btTile, dndTile, muteTile, saverTile, offTile,
+                        appsTile, launcherTile, settingsTile},
+                dockApps, closePanel);
 
         rootView.addView(overlay, match());
         overlay.setAlpha(0f);
