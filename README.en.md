@@ -177,9 +177,18 @@ Build **0.1.9** (versionCode 232) was tested on **15 November 2026**:
 - Switched back to the Android 17 style; Indonesian, the screensaver, and the screen timeout
   (600,000 ms) are unchanged.
 
-Build **0.2.0** (versionCode 233) makes the quick panel's D-pad order explicit: DOWN from a
-slider always lands on Wi-Fi, the grid steps column by column, and the last row steps into
-Dock apps / Close. The build is done; the on-TV check is pending.
+Build **0.2.0** (versionCode 233) was tested on the same TV on **16 November 2026**:
+
+- `adb install -r` succeeded; the installed version was verified as 0.2.0 (versionCode 233).
+- The D-pad order is now deterministic: DOWN from a slider always lands on **Wi-Fi** (it used to
+  jump to the bottom-right tile), the grid steps column by column, and the last row steps into
+  **Dock apps / Close**.
+- The **One UI** style is enabled and still sits in the top-right corner without clipping; the
+  same focus order applies there.
+- The **Apps** tile opens the app grid and **Close** dismisses the panel.
+- The Android 17 style still works with the new focus order.
+- The TV is left on the **One UI** style; Indonesian, the screensaver, and the screen timeout
+  (600,000 ms) are unchanged.
 
 ## Social media
 

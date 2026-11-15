@@ -177,9 +177,18 @@ Build **0.1.9** (versionCode 232) diuji langsung pada **15 November 2026**:
 - Dikembalikan ke gaya Android 17; bahasa Indonesia, screensaver, dan waktu tidur layar
   (600.000 ms) tetap seperti sebelumnya.
 
-Build **0.2.0** (versionCode 233) merapikan urutan fokus D-pad di panel quick settings: DOWN
-dari slider selalu menuju Wi-Fi, grid berjalan per kolom, dan baris terakhir menuju
-Dock apps / Tutup. Build selesai; uji di TV menyusul.
+Build **0.2.0** (versionCode 233) diuji di TV yang sama pada **16 November 2026**:
+
+- Install `adb install -r` berhasil; versi terpasang terverifikasi 0.2.0 (versionCode 233).
+- Urutan fokus D-pad sekarang pasti: dari slider tekan DOWN selalu mendarat di **Wi-Fi**
+  (sebelumnya melompat ke tile kanan bawah), grid turun per kolom, dan baris terakhir turun ke
+  **Dock apps / Tutup**.
+- Gaya **One UI** diaktifkan dan tetap di pojok kanan atas tanpa terpotong; urutan fokus yang
+  sama juga berlaku di gaya ini.
+- Tile **Apps** membuka daftar aplikasi, tombol **Tutup** menutup panel.
+- Gaya Android 17 tetap berfungsi dengan urutan fokus baru.
+- TV dibiarkan memakai gaya **One UI**; bahasa Indonesia, screensaver, dan waktu tidur layar
+  (600.000 ms) tidak berubah.
 
 ## Sosial media
 
